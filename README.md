@@ -16,6 +16,7 @@ the history of this repository has one commit per published version.
 | [atlassian_marketplace](atlassian_marketplace/README.md) | [Atlassian Marketplace](https://marketplace.atlassian.com/) app licenses and sales transactions of a vendor |
 | [github](github/README.md) | [GitHub](https://github.com/) pull requests, their comments, reviews, commits and state transitions |
 | [helpscout](helpscout/README.md) | [Help Scout](https://www.helpscout.com/) conversations, messages, satisfaction ratings and custom fields |
+| [runkeeper](runkeeper/README.md) | [Runkeeper](https://runkeeper.com/) activities, kilometer splits and heart rate zones from a Runkeeper data export |
 
 See the README of an app for what it imports, how to connect it, and what its cube contains, and its
 CHANGELOG for the changes of every published version.
