@@ -1,0 +1,23 @@
+{
+  "links": {
+    "self": "/rest/3/product-listing/developer-space/11111111-2222-3333-4444-555555555555?limit=2&cursor=Y3Vyc29yLTI="
+  },
+  "items": [
+    {
+      "productId": "16d62eda-61c8-4c61-91fb-8bbb70ab1587",
+      "appKey": "com.eazybi.atlassian-connect.eazybi-jira",
+      "appName": "eazyBI for Jira Reports, Charts, and Dashboards (old)",
+      "state": "PRIVATE",
+      "approvalStatus": "APPROVED",
+      "slug": "eazybi-jira-old"
+    },
+    {
+      "productId": "9f1e7bb1-0000-4444-8888-cccccccccccc",
+      "appKey": "com.eazybi.removed",
+      "appName": "Removed app",
+      "state": "DELETED",
+      "approvalStatus": "NOT_ASSIGNED",
+      "slug": "removed"
+    }
+  ]
+}

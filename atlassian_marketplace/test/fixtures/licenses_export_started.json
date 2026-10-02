@@ -1,0 +1,8 @@
+{
+  "_links": {
+    "self": {"href": "/reporting/developer-space/11111111-2222-3333-4444-555555555555/licenses/async/export?accept=csv"},
+    "status": {"href": "/reporting/developer-space/11111111-2222-3333-4444-555555555555/licenses/async/export/aaaa1111-bbbb-2222-cccc-333333333333/status"},
+    "download": {"href": "/reporting/developer-space/11111111-2222-3333-4444-555555555555/licenses/async/export/aaaa1111-bbbb-2222-cccc-333333333333", "type": "text/csv"}
+  },
+  "export": {"id": "aaaa1111-bbbb-2222-cccc-333333333333"}
+}

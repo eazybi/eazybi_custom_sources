@@ -1,0 +1,24 @@
+{
+  "links": {
+    "self": "/rest/3/product-listing/developer-space/11111111-2222-3333-4444-555555555555?limit=2",
+    "next": "/rest/3/product-listing/developer-space/11111111-2222-3333-4444-555555555555?limit=2&cursor=Y3Vyc29yLTI="
+  },
+  "items": [
+    {
+      "productId": "57cb8f6e-f520-425a-b49d-38df542202ef",
+      "appKey": "com.eazybi.jira.plugins.eazybi-jira",
+      "appName": "eazyBI for Jira Reports, Charts, and Dashboards",
+      "state": "PUBLIC",
+      "approvalStatus": "APPROVED",
+      "slug": "eazybi-jira"
+    },
+    {
+      "productId": "4ea45c7d-d472-4080-a331-340d20223798",
+      "appKey": "com.eazybi.confluence.plugins.eazybi-confluence",
+      "appName": "eazyBI for Confluence Reports, Charts, and Dashboards",
+      "state": "PUBLIC",
+      "approvalStatus": "APPROVED",
+      "slug": "eazybi-confluence"
+    }
+  ]
+}

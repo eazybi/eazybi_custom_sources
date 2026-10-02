@@ -1,0 +1,8 @@
+{
+  "_links": {
+    "self": {"href": "/reporting/developer-space/11111111-2222-3333-4444-555555555555/sales/transactions/async/export?accept=csv"},
+    "status": {"href": "/reporting/developer-space/11111111-2222-3333-4444-555555555555/sales/transactions/async/export/dddd4444-eeee-5555-ffff-666666666666/status"},
+    "download": {"href": "/reporting/developer-space/11111111-2222-3333-4444-555555555555/sales/transactions/async/export/dddd4444-eeee-5555-ffff-666666666666", "type": "text/csv"}
+  },
+  "export": {"id": "dddd4444-eeee-5555-ffff-666666666666"}
+}

@@ -11,7 +11,9 @@ the history of this repository has one commit per published version.
 
 ## Apps
 
-No apps are published yet.
+| App | Imports |
+|---|---|
+| [atlassian_marketplace](atlassian_marketplace/README.md) | [Atlassian Marketplace](https://marketplace.atlassian.com/) app licenses and sales transactions of a vendor |
 
 See the README of an app for what it imports, how to connect it, and what its cube contains, and its
 CHANGELOG for the changes of every published version.

@@ -1,0 +1,11 @@
+{
+  "_links": {
+    "self": {"href": "/reporting/developer-space/11111111-2222-3333-4444-555555555555"},
+    "licenses": [
+      {"href": "/reporting/developer-space/11111111-2222-3333-4444-555555555555/licenses", "name": "details"}
+    ],
+    "transactions": [
+      {"href": "/reporting/developer-space/11111111-2222-3333-4444-555555555555/sales/transactions", "name": "details"}
+    ]
+  }
+}
