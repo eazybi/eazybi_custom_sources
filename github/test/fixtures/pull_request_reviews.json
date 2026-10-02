@@ -1,0 +1,34 @@
+{
+  "data": {
+    "repository": {
+      "pullRequest": {
+        "reviews": {
+          "nodes": [
+            {
+              "state": "COMMENTED",
+              "submittedAt": "2026-02-02T09:00:00Z",
+              "body": "One question",
+              "author": {"__typename": "User", "login": "sam", "databaseId": 4700, "name": "Sam Roe", "email": "sam@example.com"},
+              "comments": {"totalCount": 0, "nodes": []}
+            },
+            {
+              "state": "CHANGES_REQUESTED",
+              "submittedAt": "2026-02-02T12:00:00Z",
+              "body": "Please split this",
+              "author": {"__typename": "User", "login": "sam", "databaseId": 4700, "name": "Sam Roe", "email": "sam@example.com"},
+              "comments": {"totalCount": 3, "nodes": [{"replyTo": null}]}
+            },
+            {
+              "state": "APPROVED",
+              "submittedAt": "2026-02-03T08:00:00Z",
+              "body": "",
+              "author": {"__typename": "User", "login": "lee", "databaseId": 4701, "name": "Lee Ray", "email": "lee@example.com"},
+              "comments": {"totalCount": 1, "nodes": [{"replyTo": null}]}
+            }
+          ],
+          "pageInfo": {"hasNextPage": false, "endCursor": "reviews2"}
+        }
+      }
+    }
+  }
+}

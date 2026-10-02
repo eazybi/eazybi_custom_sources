@@ -1,0 +1,36 @@
+{
+  "data": {
+    "repository": {
+      "pullRequests": {
+        "nodes": [
+          {
+            "fullDatabaseId": 6001,
+            "number": 12,
+            "createdAt": "2026-01-20T08:00:00Z",
+            "closedAt": null,
+            "updatedAt": "2026-01-21T08:00:00Z",
+            "state": "OPEN",
+            "isDraft": true,
+            "title": "Retry the failed uploads",
+            "headRefName": "feature/retry-uploads",
+            "mergeable": "CONFLICTING",
+            "changedFiles": 2,
+            "additions": 20,
+            "deletions": 5,
+            "mergeCommit": null,
+            "author": {"__typename": "User", "login": "dana", "databaseId": 4703, "name": "Dana Fox", "email": "dana@example.com"},
+            "milestone": null,
+            "labels": {"nodes": []},
+            "assignees": {"nodes": []},
+            "reviewRequests": {"nodes": []},
+            "reviews": {"totalCount": 0, "nodes": []},
+            "comments": {"totalCount": 0, "nodes": []},
+            "commits": {"totalCount": 0, "nodes": []},
+            "timelineItems": {"filteredCount": 0, "nodes": []}
+          }
+        ],
+        "pageInfo": {"hasNextPage": false, "endCursor": null}
+      }
+    }
+  }
+}

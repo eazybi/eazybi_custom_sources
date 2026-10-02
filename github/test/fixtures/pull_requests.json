@@ -1,0 +1,162 @@
+{
+  "data": {
+    "repository": {
+      "pullRequests": {
+        "nodes": [
+          {
+            "fullDatabaseId": 5002,
+            "number": 13,
+            "createdAt": "2026-01-08T08:00:00Z",
+            "closedAt": null,
+            "updatedAt": "2026-01-09T08:00:00Z",
+            "state": "OPEN",
+            "isDraft": false,
+            "title": "Fix the pagination",
+            "headRefName": "bugfix/pagination",
+            "mergeable": "CONFLICTING",
+            "changedFiles": 1,
+            "additions": 10,
+            "deletions": 2,
+            "mergeCommit": null,
+            "author": {"__typename": "User", "login": "sam", "databaseId": 4700, "name": "Sam Roe", "email": "sam@example.com"},
+            "milestone": null,
+            "labels": {"nodes": []},
+            "assignees": {"nodes": []},
+            "reviewRequests": {"nodes": []},
+            "reviews": {"totalCount": 0, "nodes": []},
+            "comments": {"totalCount": 0, "nodes": []},
+            "commits": {
+              "totalCount": 1,
+              "nodes": [
+                {
+                  "id": "C_kwDO13",
+                  "commit": {
+                    "oid": "ddd444",
+                    "additions": 10,
+                    "deletions": 2,
+                    "authoredDate": "2026-01-08T07:30:00Z",
+                    "author": {
+                      "user": {"__typename": "User", "login": "sam", "databaseId": 4700, "name": "Sam Roe", "email": "sam@example.com"}
+                    }
+                  }
+                }
+              ]
+            },
+            "timelineItems": {"filteredCount": 0, "nodes": []}
+          },
+          {
+            "fullDatabaseId": 5001,
+            "number": 12,
+            "createdAt": "2026-01-05T10:00:00Z",
+            "closedAt": "2026-01-07T10:00:00Z",
+            "updatedAt": "2026-01-07T10:00:00Z",
+            "state": "MERGED",
+            "isDraft": false,
+            "title": "Add the import log",
+            "headRefName": "feature/import-log",
+            "mergeable": "MERGEABLE",
+            "changedFiles": 3,
+            "additions": 120,
+            "deletions": 40,
+            "mergeCommit": {"oid": "abc123"},
+            "author": {"__typename": "User", "login": "kim", "databaseId": 4702, "name": "Kim Lee", "email": "kim@example.com"},
+            "milestone": {"id": "MI_app_4", "number": 4, "title": "1.2", "dueOn": "2026-02-01T00:00:00Z"},
+            "labels": {"nodes": [{"id": "LA_feature", "name": "feature"}, {"id": "LA_backend", "name": "backend"}]},
+            "assignees": {
+              "nodes": [{"__typename": "User", "login": "kim", "databaseId": 4702, "name": "Kim Lee", "email": "kim@example.com"}]
+            },
+            "reviewRequests": {
+              "nodes": [
+                {
+                  "requestedReviewer": {
+                    "__typename": "User", "login": "sam", "databaseId": 4700, "name": "Sam Roe", "email": "sam@example.com"
+                  }
+                },
+                {
+                  "requestedReviewer": {"__typename": "Team", "name": "Platform", "combinedSlug": "acme/platform"}
+                }
+              ]
+            },
+            "reviews": {
+              "totalCount": 3,
+              "nodes": [
+                {
+                  "id": "PRR_kwDO11",
+                  "state": "APPROVED",
+                  "submittedAt": "2026-01-06T09:00:00Z",
+                  "body": "Looks good to me",
+                  "author": {"__typename": "User", "login": "sam", "databaseId": 4700, "name": "Sam Roe", "email": "sam@example.com"},
+                  "comments": {"totalCount": 2, "nodes": [{"replyTo": null}]}
+                },
+                {
+                  "id": "PRR_kwDO12",
+                  "state": "APPROVED",
+                  "submittedAt": "2026-01-06T15:00:00Z",
+                  "body": "",
+                  "author": {"__typename": "User", "login": "sam", "databaseId": 4700, "name": "Sam Roe", "email": "sam@example.com"},
+                  "comments": {"totalCount": 0, "nodes": []}
+                },
+                {
+                  "id": "PRR_kwDO13",
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-01-06T16:00:00Z",
+                  "body": "",
+                  "author": {"__typename": "User", "login": "kim", "databaseId": 4702, "name": "Kim Lee", "email": "kim@example.com"},
+                  "comments": {"totalCount": 1, "nodes": [{"replyTo": {"id": "PRRC_kwDO11"}}]}
+                }
+              ]
+            },
+            "comments": {
+              "totalCount": 1,
+              "nodes": [
+                {
+                  "id": "IC_kwDO1",
+                  "createdAt": "2026-01-05T12:00:00Z",
+                  "author": {"__typename": "User", "login": "sam", "databaseId": 4700, "name": "Sam Roe", "email": "sam@example.com"}
+                }
+              ]
+            },
+            "commits": {
+              "totalCount": 2,
+              "nodes": [
+                {
+                  "id": "C_kwDO11",
+                  "commit": {
+                    "oid": "aaa111",
+                    "additions": 100,
+                    "deletions": 30,
+                    "authoredDate": "2026-01-05T09:00:00Z",
+                    "author": {
+                      "user": {"__typename": "User", "login": "kim", "databaseId": 4702, "name": "Kim Lee", "email": "kim@example.com"}
+                    }
+                  }
+                },
+                {
+                  "id": "C_kwDO12",
+                  "commit": {
+                    "oid": "bbb222",
+                    "additions": 20,
+                    "deletions": 10,
+                    "authoredDate": "2026-01-06T11:00:00Z",
+                    "author": {"user": null}
+                  }
+                }
+              ]
+            },
+            "timelineItems": {
+              "filteredCount": 1,
+              "nodes": [
+                {
+                  "__typename": "MergedEvent",
+                  "createdAt": "2026-01-07T10:00:00Z",
+                  "actor": {"__typename": "User", "login": "kim", "databaseId": 4702, "name": "Kim Lee", "email": "kim@example.com"}
+                }
+              ]
+            }
+          }
+        ],
+        "pageInfo": {"hasNextPage": false, "endCursor": "cursor2"}
+      }
+    }
+  }
+}

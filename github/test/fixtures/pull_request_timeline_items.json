@@ -1,0 +1,30 @@
+{
+  "data": {
+    "repository": {
+      "pullRequest": {
+        "timelineItems": {
+          "nodes": [
+            {
+              "__typename": "AssignedEvent",
+              "createdAt": "2026-02-01T11:00:00Z",
+              "actor": {"__typename": "User", "login": "kim", "databaseId": 4702, "name": "Kim Lee", "email": "kim@example.com"},
+              "assignee": {"login": "sam"}
+            },
+            {
+              "__typename": "UnassignedEvent",
+              "createdAt": "2026-02-02T11:00:00Z",
+              "actor": {"__typename": "User", "login": "kim", "databaseId": 4702, "name": "Kim Lee", "email": "kim@example.com"},
+              "assignee": {"login": "sam"}
+            },
+            {
+              "__typename": "ReopenedEvent",
+              "createdAt": "2026-02-03T09:00:00Z",
+              "actor": {"__typename": "User", "login": "kim", "databaseId": 4702, "name": "Kim Lee", "email": "kim@example.com"}
+            }
+          ],
+          "pageInfo": {"hasNextPage": false, "endCursor": "timeline2"}
+        }
+      }
+    }
+  }
+}
