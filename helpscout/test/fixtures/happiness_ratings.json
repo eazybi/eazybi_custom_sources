@@ -1,0 +1,10 @@
+{
+  "facets": {},
+  "results": [
+    {"number": 12, "threadid": 1002, "threadCreatedAt": "2026-03-01T10:30:00Z", "id": 123,
+     "type": "email", "ratingId": 1, "ratingCustomerId": 238604,
+     "ratingComments": "Thanks for the clear reply!", "ratingCreatedAt": "2026-03-02T09:00:00Z",
+     "ratingCustomerName": "Rob Robertovic", "ratingUserId": 99, "ratingUserName": "Mr Robot"}
+  ],
+  "page": 1, "count": 1, "pages": 1
+}

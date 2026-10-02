@@ -1,0 +1,15 @@
+{
+  "_embedded": {
+    "customers": [
+      {"id": 238604, "firstName": "Rob", "lastName": "Robertovic", "jobTitle": "CTO",
+       "location": "Riga", "organization": "Acme Inc", "organizationId": 7001,
+       "createdAt": "2025-06-01T10:00:00Z", "updatedAt": "2026-02-01T10:00:00Z",
+       "_embedded": {"emails": [{"id": 1, "value": "rob@acme.com", "type": "work"}]}},
+      {"id": 29418, "firstName": "Vernon", "lastName": "Bear", "location": "Boston",
+       "createdAt": "2025-06-02T10:00:00Z", "updatedAt": "2026-02-02T10:00:00Z",
+       "_embedded": {"emails": [{"id": 2, "value": "vbear@mywork.com", "type": "work"}]}}
+    ]
+  },
+  "_links": {"self": {"href": "https://api.helpscout.net/v2/customers"}},
+  "page": {"size": 50, "totalElements": 2, "totalPages": 1, "number": 1}
+}

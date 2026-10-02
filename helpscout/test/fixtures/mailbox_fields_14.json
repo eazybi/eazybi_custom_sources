@@ -1,0 +1,14 @@
+{
+  "_embedded": {
+    "fields": [
+      {"id": 204, "required": false, "order": 1, "type": "dropdown", "name": "Priority",
+       "options": [
+         {"id": 268, "order": 1, "label": "Urgent"},
+         {"id": 269, "order": 2, "label": "Normal"}
+       ]},
+      {"id": 205, "required": false, "order": 2, "type": "SINGLE_LINE", "name": "Status"}
+    ]
+  },
+  "_links": {"self": {"href": "https://api.helpscout.net/v2/mailboxes/14/fields"}},
+  "page": {"size": 50, "totalElements": 2, "totalPages": 1, "number": 1}
+}

@@ -1,0 +1,14 @@
+{
+  "_embedded": {
+    "users": [
+      {"id": 99, "firstName": "Mr", "lastName": "Robot", "email": "mrobot@acme.com",
+       "role": "user", "timezone": "America/New_York", "type": "user", "jobTitle": "Support agent",
+       "createdAt": "2025-01-01T10:00:00Z", "updatedAt": "2025-02-01T10:00:00Z"},
+      {"id": 14, "firstName": "Clo", "lastName": "Ser", "email": "closer@acme.com",
+       "role": "owner", "timezone": "Europe/Riga", "type": "user", "jobTitle": "Support lead",
+       "createdAt": "2025-01-01T10:00:00Z", "updatedAt": "2025-02-01T10:00:00Z"}
+    ]
+  },
+  "_links": {"self": {"href": "https://api.helpscout.net/v2/users"}},
+  "page": {"size": 50, "totalElements": 2, "totalPages": 1, "number": 1}
+}

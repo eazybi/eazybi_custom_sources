@@ -1,0 +1,79 @@
+{
+  "_embedded": {
+    "conversations": [
+      {
+        "id": 123, "number": 12, "threads": 3, "type": "email", "folderId": 11,
+        "status": "closed", "state": "published", "subject": "Help", "preview": "Preview",
+        "mailboxId": 13,
+        "assignee": {"id": 99, "type": "user", "first": "Mr", "last": "Robot",
+                     "email": "mrobot@acme.com"},
+        "createdBy": {"id": 238604, "type": "customer", "first": "Rob", "last": "Robertovic",
+                      "email": "rob@acme.com"},
+        "createdAt": "2026-03-01T08:00:00Z",
+        "closedBy": 14,
+        "closedByUser": {"id": 14, "type": "user", "first": "Clo", "last": "Ser",
+                         "email": "closer@acme.com"},
+        "closedAt": "2026-03-02T08:00:00Z",
+        "userUpdatedAt": "2026-03-02T08:00:00Z",
+        "source": {"type": "email", "via": "customer"},
+        "tags": [{"id": 9150, "tag": "vip"}, {"id": 9151, "tag": "billing"}],
+        "customFields": [
+          {"id": 104, "name": "Priority", "value": "168", "text": "High"},
+          {"id": 105, "name": "Product", "value": "Reports", "text": "Reports"},
+          {"id": 106, "name": "Order value", "value": "250", "text": "250"},
+          {"id": 107, "name": "Renewal date", "value": "2026-04-01", "text": "2026-04-01"},
+          {"id": 108, "name": "Internal notes", "value": "Watch this one",
+           "text": "Watch this one"},
+          {"id": 109, "name": "AI topic", "value": "180", "text": "Billing",
+           "systemType": "topic"}
+        ],
+        "primaryCustomer": {"id": 238604, "type": "customer", "first": "Rob",
+                            "last": "Robertovic", "email": "rob@acme.com"},
+        "_embedded": {
+          "threads": [
+            {"id": 1001, "type": "customer", "state": "published",
+             "createdAt": "2026-03-01T08:00:00Z",
+             "createdBy": {"id": 238604, "type": "customer", "first": "Rob",
+                           "last": "Robertovic", "email": "rob@acme.com"}},
+            {"id": 1002, "type": "message", "state": "published",
+             "createdAt": "2026-03-01T10:30:00Z",
+             "createdBy": {"id": 99, "type": "user", "first": "Mr", "last": "Robot",
+                           "email": "mrobot@acme.com"},
+             "_embedded": {"attachments": [{"id": 1, "filename": "photo1.jpg",
+                                            "mimeType": "image/jpeg", "size": 20191}]}},
+            {"id": 1003, "type": "note", "state": "published",
+             "createdAt": "2026-03-01T11:00:00Z",
+             "createdBy": {"id": 99, "type": "user", "first": "Mr", "last": "Robot",
+                           "email": "mrobot@acme.com"}}
+          ]
+        }
+      },
+      {
+        "id": 124, "number": 13, "threads": 2, "type": "email", "folderId": 11,
+        "status": "active", "state": "published", "subject": "Question", "mailboxId": 13,
+        "createdBy": {"id": 29418, "type": "customer", "first": "Vernon", "last": "Bear",
+                      "email": "vbear@mywork.com"},
+        "createdAt": "2026-03-03T09:00:00Z",
+        "userUpdatedAt": "2026-03-03T09:15:00Z",
+        "source": {"type": "web", "via": "customer"},
+        "tags": [],
+        "customFields": [
+          {"id": 106, "name": "Order value", "value": "125.50", "text": "125.50"},
+          {"id": 104, "name": "Priority", "value": "999", "text": "Whenever"}
+        ],
+        "primaryCustomer": {"id": 29418, "type": "customer", "first": "Vernon", "last": "Bear",
+                            "email": "vbear@mywork.com"},
+        "_embedded": {
+          "threads": [
+            {"id": 2001, "type": "customer", "state": "published",
+             "createdAt": "2026-03-03T09:00:00Z",
+             "createdBy": {"id": 29418, "type": "customer", "first": "Vernon", "last": "Bear",
+                           "email": "vbear@mywork.com"}}
+          ]
+        }
+      }
+    ]
+  },
+  "_links": {"self": {"href": "https://api.helpscout.net/v2/conversations"}},
+  "page": {"size": 25, "totalElements": 2, "totalPages": 1, "number": 1}
+}

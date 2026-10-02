@@ -1,0 +1,16 @@
+{
+  "_embedded": {
+    "threads": [
+      {"id": 2001, "type": "customer", "state": "published",
+       "createdAt": "2026-03-03T09:00:00Z",
+       "createdBy": {"id": 29418, "type": "customer", "first": "Vernon", "last": "Bear",
+                     "email": "vbear@mywork.com"}},
+      {"id": 2002, "type": "chat", "state": "published",
+       "createdAt": "2026-03-03T09:15:00Z",
+       "createdBy": {"id": 99, "type": "user", "first": "Mr", "last": "Robot",
+                     "email": "mrobot@acme.com"}}
+    ]
+  },
+  "_links": {"self": {"href": "https://api.helpscout.net/v2/conversations/124/threads"}},
+  "page": {"size": 25, "totalElements": 2, "totalPages": 1, "number": 1}
+}

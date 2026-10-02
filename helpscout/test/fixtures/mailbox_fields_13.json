@@ -1,0 +1,25 @@
+{
+  "_embedded": {
+    "fields": [
+      {"id": 104, "required": false, "order": 1, "type": "dropdown", "name": "Priority",
+       "options": [
+         {"id": 168, "order": 1, "label": "High"},
+         {"id": 169, "order": 2, "label": "Medium"},
+         {"id": 170, "order": 3, "label": "Low"}
+       ]},
+      {"id": 105, "required": false, "order": 2, "type": "SINGLE_LINE", "name": "Product"},
+      {"id": 106, "required": false, "order": 3, "type": "NUMBER", "name": "Order value"},
+      {"id": 107, "required": false, "order": 4, "type": "DATE", "name": "Renewal date"},
+      {"id": 108, "required": false, "order": 5, "type": "MULTI_LINE", "name": "Internal notes"},
+      {"id": 109, "required": false, "order": 6, "type": "dropdown", "name": "AI topic",
+       "systemType": "topic",
+       "options": [
+         {"id": 180, "order": 1, "label": "Billing"},
+         {"id": 181, "order": 2, "label": "Shipping"}
+       ]},
+      {"id": 110, "required": false, "order": 7, "type": "unicorn", "name": "Unsupported"}
+    ]
+  },
+  "_links": {"self": {"href": "https://api.helpscout.net/v2/mailboxes/13/fields"}},
+  "page": {"size": 50, "totalElements": 7, "totalPages": 1, "number": 1}
+}

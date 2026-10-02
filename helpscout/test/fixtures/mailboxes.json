@@ -1,0 +1,12 @@
+{
+  "_embedded": {
+    "mailboxes": [
+      {"id": 13, "name": "Support", "slug": "support", "email": "support@acme.com",
+       "createdAt": "2025-01-01T10:00:00Z", "updatedAt": "2025-01-01T10:00:00Z"},
+      {"id": 14, "name": "Sales", "slug": "sales", "email": "sales@acme.com",
+       "createdAt": "2025-01-01T10:00:00Z", "updatedAt": "2025-01-01T10:00:00Z"}
+    ]
+  },
+  "_links": {"self": {"href": "https://api.helpscout.net/v2/mailboxes"}},
+  "page": {"size": 50, "totalElements": 2, "totalPages": 1, "number": 1}
+}
