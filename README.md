@@ -17,6 +17,7 @@ the history of this repository has one commit per published version.
 | [github](github/README.md) | [GitHub](https://github.com/) pull requests, their comments, reviews, commits and state transitions |
 | [helpscout](helpscout/README.md) | [Help Scout](https://www.helpscout.com/) conversations, messages, satisfaction ratings and custom fields |
 | [runkeeper](runkeeper/README.md) | [Runkeeper](https://runkeeper.com/) activities, kilometer splits and heart rate zones from a Runkeeper data export |
+| [strava](strava/README.md) | [Strava](https://www.strava.com/) activities, kilometer splits and heart rate zones from a Strava account export |
 
 See the README of an app for what it imports, how to connect it, and what its cube contains, and its
 CHANGELOG for the changes of every published version.
