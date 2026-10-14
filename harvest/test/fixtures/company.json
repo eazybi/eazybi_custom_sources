@@ -1,0 +1,23 @@
+{
+  "base_uri":"https://example.harvestapp.com",
+  "full_domain":"example.harvestapp.com",
+  "name":"API Examples",
+  "is_active":true,
+  "week_start_day":"Monday",
+  "wants_timestamp_timers":true,
+  "time_format":"hours_minutes",
+  "date_format":"%Y-%m-%d",
+  "plan_type":"sponsored",
+  "expense_feature":true,
+  "invoice_feature":true,
+  "estimate_feature":true,
+  "approval_feature":true,
+  "clock":"12h",
+  "currency_code_display":"iso_code_none",
+  "currency_symbol_display":"symbol_before",
+  "decimal_symbol":".",
+  "thousands_separator":",",
+  "color_scheme":"orange",
+  "weekly_capacity": 126000,
+  "currency": "EUR"
+}

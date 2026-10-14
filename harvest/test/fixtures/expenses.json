@@ -1,0 +1,196 @@
+{
+  "expenses": [
+    {
+      "id": 1545413,
+      "notes": "airplane tickets",
+      "total_cost": 900.0,
+      "units": 1.0,
+      "is_closed": false,
+      "is_locked": false,
+      "is_billed": false,
+      "locked_reason": null,
+      "spent_date": "2012-02-06",
+      "created_at": "2012-02-20T12:46:38Z",
+      "updated_at": "2012-02-20T12:46:38Z",
+      "billable": true,
+      "receipt": null,
+      "user": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "user_assignment": {
+        "id": 15236545,
+        "is_project_manager": true,
+        "is_active": true,
+        "budget": null,
+        "created_at": "2012-02-20T12:23:46Z",
+        "updated_at": "2012-02-20T12:23:46Z",
+        "hourly_rate": null
+      },
+      "project": {
+        "id": 1930109,
+        "name": "eazyBI implementation for Big US company",
+        "code": "IMPL-BIGUS"
+      },
+      "expense_category": {
+        "id": 849340,
+        "name": "Transportation",
+        "unit_name": null,
+        "unit_price": null
+      },
+      "client": {
+        "id": 915261,
+        "name": "Big US company",
+        "currency": "USD"
+      },
+      "invoice": null
+    },
+    {
+      "id": 1545414,
+      "notes": "taxi from airport",
+      "total_cost": 50.0,
+      "units": 1.0,
+      "is_closed": false,
+      "is_locked": false,
+      "is_billed": false,
+      "locked_reason": null,
+      "spent_date": "2012-02-06",
+      "created_at": "2012-02-20T12:46:54Z",
+      "updated_at": "2012-02-20T12:46:54Z",
+      "billable": true,
+      "receipt": null,
+      "user": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "user_assignment": {
+        "id": 15236545,
+        "is_project_manager": true,
+        "is_active": true,
+        "budget": null,
+        "created_at": "2012-02-20T12:23:46Z",
+        "updated_at": "2012-02-20T12:23:46Z",
+        "hourly_rate": null
+      },
+      "project": {
+        "id": 1930109,
+        "name": "eazyBI implementation for Big US company",
+        "code": "IMPL-BIGUS"
+      },
+      "expense_category": {
+        "id": 849340,
+        "name": "Transportation",
+        "unit_name": null,
+        "unit_price": null
+      },
+      "client": {
+        "id": 915261,
+        "name": "Big US company",
+        "currency": "USD"
+      },
+      "invoice": null
+    },
+    {
+      "id": 1545415,
+      "notes": "hotel",
+      "total_cost": 500.0,
+      "units": 1.0,
+      "is_closed": false,
+      "is_locked": false,
+      "is_billed": false,
+      "locked_reason": null,
+      "spent_date": "2012-02-10",
+      "created_at": "2012-02-20T12:47:17Z",
+      "updated_at": "2012-02-20T12:47:17Z",
+      "billable": true,
+      "receipt": null,
+      "user": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "user_assignment": {
+        "id": 15236545,
+        "is_project_manager": true,
+        "is_active": true,
+        "budget": null,
+        "created_at": "2012-02-20T12:23:46Z",
+        "updated_at": "2012-02-20T12:23:46Z",
+        "hourly_rate": null
+      },
+      "project": {
+        "id": 1930109,
+        "name": "eazyBI implementation for Big US company",
+        "code": "IMPL-BIGUS"
+      },
+      "expense_category": {
+        "id": 849339,
+        "name": "Lodging",
+        "unit_name": null,
+        "unit_price": null
+      },
+      "client": {
+        "id": 915261,
+        "name": "Big US company",
+        "currency": "USD"
+      },
+      "invoice": null
+    },
+    {
+      "id": 1545416,
+      "notes": "taxi to airport",
+      "total_cost": 50.0,
+      "units": 1.0,
+      "is_closed": false,
+      "is_locked": false,
+      "is_billed": false,
+      "locked_reason": null,
+      "spent_date": "2012-02-10",
+      "created_at": "2012-02-20T12:47:30Z",
+      "updated_at": "2012-02-20T12:47:30Z",
+      "billable": true,
+      "receipt": null,
+      "user": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "user_assignment": {
+        "id": 15236545,
+        "is_project_manager": true,
+        "is_active": true,
+        "budget": null,
+        "created_at": "2012-02-20T12:23:46Z",
+        "updated_at": "2012-02-20T12:23:46Z",
+        "hourly_rate": null
+      },
+      "project": {
+        "id": 1930109,
+        "name": "eazyBI implementation for Big US company",
+        "code": "IMPL-BIGUS"
+      },
+      "expense_category": {
+        "id": 849340,
+        "name": "Transportation",
+        "unit_name": null,
+        "unit_price": null
+      },
+      "client": {
+        "id": 915261,
+        "name": "Big US company",
+        "currency": "USD"
+      },
+      "invoice": null
+    }
+  ],
+  "per_page": 2000,
+  "total_pages": 1,
+  "total_entries": 4,
+  "next_page": null,
+  "previous_page": null,
+  "page": 1,
+  "links": {
+    "first": "https://api.harvestapp.com/v2/expenses?page=1&per_page=2000",
+    "next": null,
+    "previous": null,
+    "last": "https://api.harvestapp.com/v2/expenses?page=1&per_page=2000"
+  }
+}

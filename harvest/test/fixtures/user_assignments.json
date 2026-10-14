@@ -1,0 +1,124 @@
+{
+  "user_assignments": [
+    {
+      "id": 15236541,
+      "project": {
+        "id": 1930099,
+        "name": "Internal",
+        "code": null
+      },
+      "user": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "is_project_manager": true,
+      "is_active": true,
+      "budget": null,
+      "hourly_rate": null,
+      "created_at": "2012-02-20T12:20:48Z",
+      "updated_at": "2012-02-20T12:20:48Z"
+    },
+    {
+      "id": 15236545,
+      "project": {
+        "id": 1930103,
+        "name": "eazyBI development",
+        "code": "EAZYBI"
+      },
+      "user": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "is_project_manager": true,
+      "is_active": true,
+      "budget": null,
+      "hourly_rate": null,
+      "created_at": "2012-02-20T12:23:46Z",
+      "updated_at": "2012-02-20T12:23:46Z"
+    },
+    {
+      "id": 15236572,
+      "project": {
+        "id": 1930109,
+        "name": "eazyBI implementation for Big US company",
+        "code": "IMPL-BIGUS"
+      },
+      "user": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "is_project_manager": true,
+      "is_active": true,
+      "budget": null,
+      "hourly_rate": 90.0,
+      "created_at": "2012-02-20T12:27:13Z",
+      "updated_at": "2012-02-20T12:28:00Z"
+    },
+    {
+      "id": 15236609,
+      "project": {
+        "id": 1930115,
+        "name": "Consulting for Small European company",
+        "code": "CONS-SMALLEU"
+      },
+      "user": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "is_project_manager": true,
+      "is_active": true,
+      "budget": 160.0,
+      "hourly_rate": 70.0,
+      "created_at": "2012-02-20T12:29:37Z",
+      "updated_at": "2012-02-20T12:30:29Z"
+    },
+    {
+      "id": 15236610,
+      "project": {
+        "id": 1930115,
+        "name": "Consulting for Small European company",
+        "code": "CONS-SMALLEU"
+      },
+      "user": {
+        "id": 312875,
+        "name": "Chuck Norris"
+      },
+      "is_project_manager": false,
+      "is_active": true,
+      "budget": 0.0,
+      "hourly_rate": null,
+      "created_at": "2012-02-20T12:31:02Z",
+      "updated_at": "2012-02-20T12:31:02Z"
+    },
+    {
+      "id": 15236609,
+      "project": {
+        "id": 11637625,
+        "name": "FIXED-PRICE",
+        "code": null
+      },
+      "user": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "is_project_manager": true,
+      "is_active": true,
+      "budget": 160.0,
+      "hourly_rate": 70.0,
+      "created_at": "2012-02-20T12:29:37Z",
+      "updated_at": "2012-02-20T12:30:29Z"
+    }
+  ],
+  "per_page": 2000,
+  "total_pages": 1,
+  "total_entries": 6,
+  "next_page": null,
+  "previous_page": null,
+  "page": 1,
+  "links": {
+    "first": "https://api.harvestapp.com/v2/user_assignments?page=1&per_page=2000",
+    "next": null,
+    "previous": null,
+    "last": "https://api.harvestapp.com/v2/user_assignments?page=1&per_page=2000"
+  }
+}

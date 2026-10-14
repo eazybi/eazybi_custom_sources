@@ -15,6 +15,7 @@ the history of this repository has one commit per published version.
 |---|---|
 | [atlassian_marketplace](atlassian_marketplace/README.md) | [Atlassian Marketplace](https://marketplace.atlassian.com/) app licenses and sales transactions of a vendor |
 | [github](github/README.md) | [GitHub](https://github.com/) pull requests, their comments, reviews, commits and state transitions |
+| [harvest](harvest/README.md) | [Harvest](https://www.getharvest.com/) clients, projects, people, timesheet entries, expenses and invoices |
 | [helpscout](helpscout/README.md) | [Help Scout](https://www.helpscout.com/) conversations, messages, satisfaction ratings and custom fields |
 | [runkeeper](runkeeper/README.md) | [Runkeeper](https://runkeeper.com/) activities, kilometer splits and heart rate zones from a Runkeeper data export |
 | [strava](strava/README.md) | [Strava](https://www.strava.com/) activities, kilometer splits and heart rate zones from a Strava account export |

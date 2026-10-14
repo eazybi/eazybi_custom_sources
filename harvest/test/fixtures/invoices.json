@@ -1,0 +1,225 @@
+{
+  "invoices": [
+    {
+      "id": 1242635,
+      "client_key": "0000000000000000000000000000000000000001",
+      "number": "2",
+      "purchase_order": "PO-1242635",
+      "amount": 200.0,
+      "due_amount": 200.0,
+      "tax": null,
+      "tax_amount": 0.0,
+      "tax2": null,
+      "tax2_amount": 0.0,
+      "discount": null,
+      "discount_amount": 0.0,
+      "subject": "",
+      "notes": "",
+      "state": "draft",
+      "period_start": null,
+      "period_end": null,
+      "issue_date": "2012-02-21",
+      "due_date": "2012-03-07",
+      "payment_term": "net_15",
+      "sent_at": null,
+      "paid_at": null,
+      "paid_date": null,
+      "closed_at": null,
+      "recurring_invoice_id": 33460,
+      "created_at": "2012-02-20T22:05:17Z",
+      "updated_at": "2012-02-20T22:05:17Z",
+      "currency": "USD",
+      "payment_options": [],
+      "client": {
+        "id": 915261,
+        "name": "Big US company"
+      },
+      "estimate": null,
+      "retainer": null,
+      "creator": {
+        "id": null,
+        "name": ""
+      },
+      "line_items": [
+        {
+          "id": 48293,
+          "kind": "Service",
+          "description": "Remote eazyBI monthly subscription",
+          "quantity": 1.0,
+          "unit_price": 200.0,
+          "amount": 200.0,
+          "taxed": false,
+          "taxed2": false
+        }
+      ]
+    },
+    {
+      "id": 1241021,
+      "client_key": "0000000000000000000000000000000000000002",
+      "number": "1",
+      "purchase_order": "PO-1241021",
+      "amount": 683.2,
+      "due_amount": 0.0,
+      "tax": 22.0,
+      "tax_amount": 123.2,
+      "tax2": null,
+      "tax2_amount": 0.0,
+      "discount": null,
+      "discount_amount": 0.0,
+      "subject": "",
+      "notes": "",
+      "state": "paid",
+      "period_start": "2012-02-02",
+      "period_end": "2012-02-02",
+      "issue_date": "2012-02-20",
+      "due_date": "2012-02-20",
+      "payment_term": "upon_receipt",
+      "sent_at": null,
+      "paid_at": null,
+      "paid_date": null,
+      "closed_at": null,
+      "recurring_invoice_id": null,
+      "created_at": "2012-02-20T12:50:21Z",
+      "updated_at": "2012-02-20T12:51:34Z",
+      "currency": "EUR",
+      "payment_options": [],
+      "client": {
+        "id": 915262,
+        "name": "Small European company"
+      },
+      "estimate": null,
+      "retainer": null,
+      "creator": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "line_items": [
+        {
+          "id": null,
+          "kind": "Service",
+          "description": "[CONS-SMALLEU] Consulting for Small European company: Consulting (2012-02-02 - 2012-02-02)",
+          "quantity": 8.0,
+          "unit_price": 70.0,
+          "amount": 560.0,
+          "taxed": true,
+          "taxed2": false,
+          "project": {
+            "id": 1930115,
+            "name": "Consulting for Small European company",
+            "code": "CONS-SMALLEU"
+          }
+        }
+      ]
+    },
+    {
+      "id": 10577835,
+      "client_key": "0000000000000000000000000000000000000003",
+      "number": "1",
+      "purchase_order": "PO-10577835",
+      "amount": 2200.0,
+      "due_amount": 2200.0,
+      "tax": null,
+      "tax_amount": 0.0,
+      "tax2": null,
+      "tax2_amount": 0.0,
+      "discount": null,
+      "discount_amount": 0.0,
+      "subject": "",
+      "notes": "asd",
+      "state": "open",
+      "period_start": null,
+      "period_end": null,
+      "issue_date": "2016-09-05",
+      "due_date": "2016-09-05",
+      "payment_term": "upon_receipt",
+      "sent_at": null,
+      "paid_at": null,
+      "paid_date": null,
+      "closed_at": null,
+      "recurring_invoice_id": null,
+      "created_at": "2016-09-05T04:54:05Z",
+      "updated_at": "2016-09-05T05:26:08Z",
+      "currency": "EUR",
+      "payment_options": [],
+      "client": {
+        "id": 915262,
+        "name": "Small European company"
+      },
+      "estimate": null,
+      "retainer": null,
+      "creator": {
+        "id": 312294,
+        "name": "Riley Smith"
+      },
+      "line_items": [
+        {
+          "id": 53341,
+          "kind": "Service",
+          "description": "123123",
+          "quantity": 1.0,
+          "unit_price": 100.0,
+          "amount": 100.0,
+          "taxed": false,
+          "taxed2": false,
+          "project": null
+        },
+        {
+          "id": 53342,
+          "kind": "Service",
+          "description": "asdasd",
+          "quantity": 1.0,
+          "unit_price": 200.0,
+          "amount": 200.0,
+          "taxed": false,
+          "taxed2": false,
+          "project": null
+        },
+        {
+          "id": 53343,
+          "kind": "Service",
+          "description": "1 1 ",
+          "quantity": 2.0,
+          "unit_price": 400.0,
+          "amount": 800.0,
+          "taxed": false,
+          "taxed2": false,
+          "project": null
+        },
+        {
+          "id": 53344,
+          "kind": "Service",
+          "description": "123sdf",
+          "quantity": 5.0,
+          "unit_price": 100.0,
+          "amount": 500.0,
+          "taxed": false,
+          "taxed2": false,
+          "project": null
+        },
+        {
+          "id": 53345,
+          "kind": "Service",
+          "description": "123 sdf 2",
+          "quantity": 12.0,
+          "unit_price": 50.0,
+          "amount": 600.0,
+          "taxed": false,
+          "taxed2": false,
+          "project": null
+        }
+      ]
+    }
+  ],
+  "per_page": 2000,
+  "total_pages": 1,
+  "total_entries": 3,
+  "next_page": null,
+  "previous_page": null,
+  "page": 1,
+  "links": {
+    "first": "https://api.harvestapp.com/v2/invoices?page=1&per_page=2000",
+    "next": null,
+    "previous": null,
+    "last": "https://api.harvestapp.com/v2/invoices?page=1&per_page=2000"
+  }
+}

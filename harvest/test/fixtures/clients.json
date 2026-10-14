@@ -1,0 +1,52 @@
+{
+  "clients": [
+    {
+      "id": 915261,
+      "name": "Big US company",
+      "is_active": true,
+      "address": null,
+      "currency": "USD",
+      "created_at": "2012-02-20T12:25:12Z",
+      "updated_at": "2012-02-20T12:25:12Z",
+      "statement_key": null,
+      "currency_symbol": "$",
+      "details": ""
+    },
+    {
+      "id": 915259,
+      "name": "eazyBI",
+      "is_active": true,
+      "address": null,
+      "currency": "USD",
+      "created_at": "2012-02-20T12:20:47Z",
+      "updated_at": "2012-02-20T12:20:47Z",
+      "statement_key": null,
+      "currency_symbol": "$",
+      "details": ""
+    },
+    {
+      "id": 915262,
+      "name": "Small European company",
+      "is_active": true,
+      "address": null,
+      "currency": "EUR",
+      "created_at": "2012-02-20T12:25:31Z",
+      "updated_at": "2012-02-20T12:25:31Z",
+      "statement_key": null,
+      "currency_symbol": "€",
+      "details": ""
+    }
+  ],
+  "per_page": 100,
+  "total_pages": 1,
+  "total_entries": 3,
+  "next_page": null,
+  "previous_page": null,
+  "page": 1,
+  "links": {
+    "first": "https://api.harvestapp.com/v2/clients?page=1&per_page=100",
+    "next": null,
+    "previous": null,
+    "last": "https://api.harvestapp.com/v2/clients?page=1&per_page=100"
+  }
+}

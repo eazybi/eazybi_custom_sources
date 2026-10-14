@@ -1,0 +1,46 @@
+{
+  "tasks": [
+    {
+      "id": 1245123,
+      "name": "Project Management",
+      "billable_by_default": false,
+      "default_hourly_rate": null,
+      "is_default": true,
+      "is_active": true,
+      "created_at": "2012-02-20T12:20:47Z",
+      "updated_at": "2012-02-20T12:20:47Z"
+    },
+    {
+      "id": 1245128,
+      "name": "Support",
+      "billable_by_default": true,
+      "default_hourly_rate": null,
+      "is_default": false,
+      "is_active": true,
+      "created_at": "2012-02-20T12:24:17Z",
+      "updated_at": "2012-02-20T12:24:17Z"
+    },
+    {
+      "id": 1245125,
+      "name": "Vacation",
+      "billable_by_default": false,
+      "default_hourly_rate": null,
+      "is_default": false,
+      "is_active": true,
+      "created_at": "2012-02-20T12:20:48Z",
+      "updated_at": "2012-02-20T12:20:48Z"
+    }
+  ],
+  "per_page": 4,
+  "total_pages": 2,
+  "total_entries": 7,
+  "next_page": null,
+  "previous_page": 1,
+  "page": 2,
+  "links": {
+    "first": "https://api.harvestapp.com/v2/tasks?page=1&per_page=4",
+    "next": null,
+    "previous": "https://api.harvestapp.com/v2/tasks?cursor=eyJiZWZvcmUiOnsiaWQiOjEyNDUxMjN9fQ&per_page=4",
+    "last": "https://api.harvestapp.com/v2/tasks?page=2&per_page=4"
+  }
+}
