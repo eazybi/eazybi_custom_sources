@@ -4,6 +4,17 @@ All notable changes of the Runkeeper source application type are documented in t
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and by
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-10-24
+
+### Added
+
+- Generated sample data in `test/sample_data.js` — the data export of an invented runner with about
+  two and a half years of runs, rides, walks, hikes and ski trips, their GPS tracks and heart rates —
+  which imports with `eazybi custom-source-apps import-sample-data` and shows the sample reports
+  without a Runkeeper export.
+- The eazyBI Marketplace description in `MARKETPLACE.md` with the screenshots of the sample reports
+  in `assets/`.
+
 ## [1.0.0] - 2026-09-30
 
 ### Added
