@@ -4,6 +4,22 @@ All notable changes of the Help Scout source application type are documented in 
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and by
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-10-24
+
+### Added
+
+- Generated sample data in `test/sample_data.js` — about 13 months of the conversations, messages,
+  satisfaction ratings and inbox custom fields of an invented support team — which imports with
+  `eazybi custom-source-apps import-sample-data` and shows the sample reports without a Help Scout
+  account.
+- The eazyBI Marketplace description in `MARKETPLACE.md` with the screenshots of the sample reports
+  in `assets/`.
+
+### Fixed
+
+- The Happiness over time sample report shows the happiness score on a separate axis, so that the
+  percentage is not flattened to zero by the scale of the rating counts.
+
 ## [1.6.0] - 2026-09-30
 
 ### Added

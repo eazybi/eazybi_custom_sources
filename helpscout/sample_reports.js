@@ -243,7 +243,8 @@ app.defineSampleReports((samples) => {
         current: "line_chart",
         line_chart: {series_options: {
           "Ratings": {type: "column", color: samples.color("$neutral-3")},
-          "Happiness score": {type: "line", color: samples.color("$green-7")}
+          // A percentage on a second axis, because it does not share the scale of the rating counts.
+          "Happiness score": {type: "line", separateAxis: 1, color: samples.color("$green-7")}
         }}
       }
     }

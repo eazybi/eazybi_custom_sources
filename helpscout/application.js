@@ -6,7 +6,7 @@ app.defineApplication({
   key: "helpscout",
   name: "Help Scout",
   description: "Imports Help Scout conversations, messages, customers and satisfaction ratings",
-  version: "1.6.0",
+  version: "1.6.1",
   author: "eazyBI",
   license: "MIT",
   baseUrl: "https://api.helpscout.net",
