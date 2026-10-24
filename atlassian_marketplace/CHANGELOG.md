@@ -4,6 +4,18 @@ All notable changes of the Atlassian Marketplace source application type are doc
 file, in the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and by
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-10-24
+
+### Added
+
+- Generated sample data in `test/sample_data.js` — about four years of the licenses and the sales
+  transactions of the three apps of an invented vendor, with cloud and Data Center sales, renewals,
+  upgrades, refunds and partner sales — which imports with
+  `eazybi custom-source-apps import-sample-data` and shows the sample reports without a Marketplace
+  vendor account.
+- The eazyBI Marketplace description in `MARKETPLACE.md` with the screenshots of the sample reports
+  in `assets/`.
+
 ## [1.2.0] - 2026-10-02
 
 ### Added

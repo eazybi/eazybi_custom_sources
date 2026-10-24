@@ -2,7 +2,7 @@ app.defineApplication({
   key: "atlassian_marketplace",
   name: "Atlassian Marketplace",
   description: "Imports Atlassian Marketplace app licenses and sales transactions of a vendor",
-  version: "1.2.0",
+  version: "1.2.1",
   author: "eazyBI",
   license: "MIT",
   tableAlias: "amkt",
