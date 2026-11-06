@@ -1,0 +1,6 @@
+[
+  {"id": "summary", "name": "Summary", "custom": false},
+  {"id": "customfield_10100", "name": "Checklist Text", "custom": true},
+  {"id": "customfield_10101", "name": "Checklist Text (view-only)", "custom": true},
+  {"id": "customfield_10102", "name": "Checklist Progress %", "custom": true}
+]

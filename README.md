@@ -17,6 +17,7 @@ the history of this repository has one commit per published version.
 | [github](github/README.md) | [GitHub](https://github.com/) pull requests, their comments, reviews, commits and state transitions |
 | [harvest](harvest/README.md) | [Harvest](https://www.getharvest.com/) clients, projects, people, timesheet entries, expenses and invoices |
 | [helpscout](helpscout/README.md) | [Help Scout](https://www.helpscout.com/) conversations, messages, satisfaction ratings and custom fields |
+| [herocoders_checklists](herocoders_checklists/README.md) | [Checklists for Jira by HeroCoders](https://marketplace.atlassian.com/apps/1211562/checklists-for-jira-enterprise-by-herocoders) checklists and checklist items into the Issues cube of a Jira source — a Jira addon |
 | [runkeeper](runkeeper/README.md) | [Runkeeper](https://runkeeper.com/) activities, kilometer splits and heart rate zones from a Runkeeper data export |
 | [strava](strava/README.md) | [Strava](https://www.strava.com/) activities, kilometer splits and heart rate zones from a Strava account export |
 

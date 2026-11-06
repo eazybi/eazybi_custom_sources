@@ -1,0 +1,108 @@
+{
+  "isLast": true,
+  "issues": [
+    {
+      "id": "10001",
+      "key": "DEV-1",
+      "fields": {
+        "created": "2026-01-05T10:00:00.000+0000",
+        "customfield_10100": "# Definition of done\n--- Code\n* [done] Code reviewed\n>> Two reviewers\n* [open] Tests written\n\n# Release\n* [x] Release notes\n"
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 4,
+        "total": 4,
+        "histories": [
+          {
+            "id": "10103",
+            "created": "2026-01-12T09:30:00.000+0000",
+            "items": [
+              {
+                "field": "Checklist Text",
+                "fieldtype": "custom",
+                "fieldId": "customfield_10100",
+                "from": null,
+                "fromString": "# Definition of done\n* [open] Code reviewed\n* [open] Tests written\n\n# Release\n* [x] Release notes\n",
+                "to": null,
+                "toString": "# Definition of done\n--- Code\n* [done] Code reviewed\n>> Two reviewers\n* [open] Tests written\n\n# Release\n* [x] Release notes\n"
+              }
+            ]
+          },
+          {
+            "id": "10102",
+            "created": "2026-01-10T16:00:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "1",
+                "fromString": "To Do",
+                "to": "3",
+                "toString": "In Progress"
+              }
+            ]
+          },
+          {
+            "id": "10100",
+            "created": "2026-01-08T11:00:00.000+0000",
+            "items": [
+              {
+                "field": "Checklist Text",
+                "fieldtype": "custom",
+                "fieldId": "customfield_10100",
+                "from": null,
+                "fromString": "# Definition of done\n* [open] Code reviewed\n* [open] Tests written\n\n# Release\n* [x] Release notes\n",
+                "to": null,
+                "toString": "# Definition of done\n* [done] Code reviewed\n* [open] Tests written\n\n# Release\n* [x] Release notes\n"
+              }
+            ]
+          },
+          {
+            "id": "10101",
+            "created": "2026-01-09T15:00:00.000+0000",
+            "items": [
+              {
+                "field": "Checklist Text",
+                "fieldtype": "custom",
+                "fieldId": "customfield_10100",
+                "from": null,
+                "fromString": "# Definition of done\n* [done] Code reviewed\n* [open] Tests written\n\n# Release\n* [x] Release notes\n",
+                "to": null,
+                "toString": "# Definition of done\n* [open] Code reviewed\n* [open] Tests written\n\n# Release\n* [x] Release notes\n"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "10002",
+      "key": "DEV-2",
+      "fields": {
+        "created": "2026-01-06T12:00:00.000+0000",
+        "customfield_10100": "# Definition of done\n---Review\n* [in progress] Code reviewed\n* [skipped] [Docs updated](docs.example.com)\n* [] Tests written\n"
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 0,
+        "total": 0,
+        "histories": []
+      }
+    },
+    {
+      "id": "10003",
+      "key": "OTHER-1",
+      "fields": {
+        "created": "2026-01-07T12:00:00.000+0000",
+        "customfield_10100": "* [open] Not imported issue item\n"
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 0,
+        "total": 0,
+        "histories": []
+      }
+    }
+  ]
+}
