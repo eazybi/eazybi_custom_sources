@@ -13,17 +13,20 @@ app.defineApplication({
   key: "harvest",
   name: "Harvest",
   description: "Imports Harvest clients, projects, people, timesheet entries, expenses and invoices",
-  version: "1.0.0",
+  version: "1.1.0",
   author: "eazyBI",
   license: "MIT",
   baseUrl: "https://api.harvestapp.com/v2",
+  // Between two checks for deleted records, an import reads the time entries, expenses and invoices, the bulk
+  // of the data, only when they changed (importer.js). eazyBI Cloud paid plans may therefore import it every hour.
+  incrementalImport: true,
 
   sourceParams: [
     {key: "api_token", type: "secret", label: "Personal access token", required: true,
      hint: "Create it in Harvest under Settings > Developers > Create new personal access token, " +
            "at id.getharvest.com/developers. It has to belong to a Harvest administrator — only an " +
            "administrator may read the time, the expenses and the invoices of the whole account."},
-    {key: "site_url", type: "text", label: "Harvest web address", required: true,
+    {key: "site_url", type: "text", label: "Harvest web address", required: true, url: true,
      hint: "The web address you open Harvest at, for example https://yourcompany.harvestapp.com. " +
            "It tells which Harvest account to import, and clients, projects and people link to Harvest " +
            "with it."}

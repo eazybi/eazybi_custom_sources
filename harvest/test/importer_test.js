@@ -654,7 +654,7 @@ describe("app.importer.importAll", () => {
     beforeEach(mockHarvestAccount);
 
     test("asks Harvest for the time entries, expenses and invoices changed since the last import", () => {
-      mock.maxParams({updated_at: "2026-01-01T00:00:00Z", generation: 1, sweep_at: TODAY});
+      mock.maxParams({updated_at: "2026-01-01T00:00:00Z", generation: 1, sweep_at: TODAY, row_columns: "2"});
       mockClassifiedTimeEntries();
 
       importRun.run();
@@ -665,6 +665,22 @@ describe("app.importer.importAll", () => {
       expect(requestsByPath["/v2/invoices"].params.updated_since).toBe("2026-01-01T00:00:00Z");
       expect(requestsByPath["/v2/projects"].params.updated_since).toBeUndefined();
       expect(requestsByPath["/v2/users"].params.updated_since).toBeUndefined();
+    });
+
+    // The rows which an import of version 1.0.0 stored have no value in the columns which version 2 of the
+    // row columns added.
+    test("reads everything once after the timesheet rows got new columns", () => {
+      mock.maxParams({updated_at: LONG_AGO, generation: 1, sweep_at: TODAY, features: "expenses,invoices"});
+      mockClassifiedTimeEntries();
+
+      importRun.run();
+
+      expect(updatedSinceOf("/v2/time_entries")).toBeUndefined();
+      expect(updatedSinceOf("/v2/expenses")).toBeUndefined();
+      expect(updatedSinceOf("/v2/invoices")).toBeUndefined();
+      expect(importRun.maxParams()).toMatchObject({generation: 2, row_columns: "2"});
+      expect(importRun.log().join("\n")).toMatch(/The timesheet rows have new columns/);
+      expect(sumOf("hours_without_notes")).toBeCloseTo(16);
     });
 
     test("asks for everything again when the user starts a reimport", () => {
@@ -721,7 +737,7 @@ describe("app.importer.importAll", () => {
 
     // The rows of an import of the app before it stored what it classified the time entries by.
     test("reads every time entry when it is not stored what the time entries were classified by", () => {
-      mock.maxParams({updated_at: LONG_AGO, generation: 1, sweep_at: TODAY});
+      mock.maxParams({updated_at: LONG_AGO, generation: 1, sweep_at: TODAY, row_columns: "2"});
 
       importRun.run();
 
@@ -919,7 +935,7 @@ describe("app.importer.importAll", () => {
     beforeEach(mockHarvestAccount);
 
     test("writes the generation of the last check with an import which does not check", () => {
-      mock.maxParams({updated_at: LONG_AGO, generation: 2, sweep_at: TODAY});
+      mock.maxParams({updated_at: LONG_AGO, generation: 2, sweep_at: TODAY, row_columns: "2"});
       mockClassifiedTimeEntries();
 
       importRun.run();
@@ -930,9 +946,24 @@ describe("app.importer.importAll", () => {
       expect(importRun.maxParams()).toMatchObject({generation: 2, sweep_at: TODAY});
     });
 
+    // A full read without a check would keep the rows of a record deleted, or moved out of the selection,
+    // since the last import, without the values of the new columns.
+    test("removes what Harvest no longer lists with the first import after the timesheet rows got new columns",
+      () => {
+        importRun.run();
+        deleteRecordsInHarvest();
+        mock.maxParams({updated_at: LONG_AGO, generation: 1, sweep_at: TODAY, features: "expenses,invoices"});
+
+        importRun.run();
+
+        expectDeletedRecordsRemoved();
+        expect(storedGenerations()).toEqual([2]);
+        expect(importRun.maxParams().row_columns).toBe("2");
+      });
+
     // The rows of an import of the app before it checked for deleted records carry no generation.
     test("removes with the first check what Harvest no longer lists", () => {
-      mock.maxParams({updated_at: LONG_AGO, sweep_at: TODAY});
+      mock.maxParams({updated_at: LONG_AGO, sweep_at: TODAY, row_columns: "2"});
       importRun.run();
       expect(storedGenerations()).toEqual([null]);
 
@@ -1294,7 +1325,7 @@ describe("app.importer.importAll", () => {
       mock.get("/v2/company", {json: company});
       mock.get("/v2/invoices", {fixture: "invoices"});
       // The marks of an import before the failed one, so that this import is not a check.
-      mock.maxParams({updated_at: LONG_AGO, generation: 1, sweep_at: TODAY});
+      mock.maxParams({updated_at: LONG_AGO, generation: 1, sweep_at: TODAY, row_columns: "2"});
 
       importRun.run();
 
@@ -1451,7 +1482,7 @@ describe("app.importer.importAll", () => {
 
     test("skips the rows of the projects which are not selected and reports an unknown project", () => {
       mock.maxParams({updated_at: LONG_AGO, generation: 1, sweep_at: TODAY, features: "expenses,invoices",
-                      selection: SELECTION.join(","), selection_clients: "915259,915262"});
+                      row_columns: "2", selection: SELECTION.join(","), selection_clients: "915259,915262"});
       mockClassifiedTimeEntries();
       mock.get("/v2/time_entries", {json: {time_entries: [
         {id: 1, spent_date: "2012-02-01", hours_without_timer: 3, rounded_hours: 3, is_closed: false,

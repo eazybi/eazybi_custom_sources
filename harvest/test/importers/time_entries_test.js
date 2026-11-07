@@ -130,6 +130,31 @@ describe("app.importers.timeEntries", () => {
       ]);
   });
 
+  // Detailed data rows of a measure lists only the rows which store it.
+  test("stores the unbillable and the uninvoiced hours and amount only on the rows they count on", () => {
+    importEntries([timeEntry({id: 1, project: {id: 1930109}, task: {id: 1245133}}),
+                   timeEntry({id: 2, project: {id: 1930109}, task: {id: 1245122}}),
+                   timeEntry({id: 3, project: {id: 1930109}, task: {id: 1245122}, is_billed: true})]);
+
+    expect(_.sortBy(entryRows(["unbillable_hours", "uninvoiced_hours", "uninvoiced_amount",
+                               "uninvoiced_amount_with_expenses"]), (row) => row._source_id)).
+      toMatchObject([
+        {_source_id: "1", unbillable_hours: null, uninvoiced_hours: 8, uninvoiced_amount: 720,
+         uninvoiced_amount_with_expenses: 720},
+        {_source_id: "2", unbillable_hours: 8, uninvoiced_hours: null, uninvoiced_amount: null,
+         uninvoiced_amount_with_expenses: null},
+        {_source_id: "3", unbillable_hours: null, uninvoiced_hours: null, uninvoiced_amount: null,
+         uninvoiced_amount_with_expenses: null}
+      ]);
+  });
+
+  test("stores the hours without notes only on the rows of the entries without a note", () => {
+    importEntries([timeEntry({id: 1}), timeEntry({id: 2, notes: " "}), timeEntry({id: 3, notes: null})]);
+
+    expect(_.sortBy(entryRows(["hours_without_notes"]), (row) => row._source_id).
+      map((row) => row.hours_without_notes)).toEqual([null, 8, 8]);
+  });
+
   // A task assignment changed after the time was tracked, or an entry changed by itself, does not
   // change whether Harvest bills that time.
   test("bills the hours Harvest answers as billable with the entry", () => {
@@ -475,6 +500,20 @@ describe("app.importers.timeEntries by the working time", () => {
     // The entry of one row stores each sum rounded to two decimal places.
     [["hours", 8.05], ["rounded_hours", 8.1], ["billable_hours", 8.1], ["invoiced_hours", 8.1],
      ["billable_amount", 549.91], ["invoiced_amount", 549.91], ["cost_amount", 269.97]].
+      forEach((sum) => expect(rows[0][sum[0]] + rows[1][sum[0]]).toBeCloseTo(sum[1], 9));
+  });
+
+  test("shares the uninvoiced sums, the hours without notes and the unlinked hours of a split entry", () => {
+    importEntries([timedEntry("2012-02-01", "8:10am", "5:00pm", 8.05,
+                              {rounded_hours: 8.1, billable: true, notes: null})]);
+    var rows = workingTimeRows(["uninvoiced_hours", "uninvoiced_amount", "uninvoiced_amount_with_expenses",
+                                "hours_without_notes", "unlinked_hours"]);
+
+    expect(rows[0]).toEqual({_source_id: "74615858", working_time_id: BUSINESS_HOURS, hours: 7.29,
+      uninvoiced_hours: 7.34, uninvoiced_amount: 498.03, uninvoiced_amount_with_expenses: 498.03,
+      hours_without_notes: 7.29, unlinked_hours: 7.29});
+    [["uninvoiced_hours", 8.1], ["uninvoiced_amount", 549.91], ["uninvoiced_amount_with_expenses", 549.91],
+     ["hours_without_notes", 8.05], ["unlinked_hours", 8.05]].
       forEach((sum) => expect(rows[0][sum[0]] + rows[1][sum[0]]).toBeCloseTo(sum[1], 9));
   });
 

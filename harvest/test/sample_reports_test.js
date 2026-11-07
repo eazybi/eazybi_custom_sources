@@ -1,5 +1,5 @@
 // sample_reports.js is a declarative file: a test run evaluates api.js, importer.js and the importers,
-// never it, so the thirteen sample reports and the dashboard are mirrored below by everything they name —
+// never it, so the fourteen sample reports and the dashboard are mirrored below by everything they name —
 // the cube of each report, the level of each of its axes, the measures it shows, filters and orders by,
 // and the dimensions of its page filters. The assertions resolve all of it against the schema and
 // against an import of the fixtures, which is what tells whether a sample report opens with its data or
@@ -41,8 +41,8 @@ var REPORTS = [
   {name: "Sample hours by external item",
    cube: TIMESHEETS,
    rows: {dimension: "External Item", level: "Service"},
-   columns: {measures: ["Hours", "Billable hours", "Unbillable hours"]},
-   filterMeasures: ["Hours"],
+   columns: {measures: ["Rounded hours", "Billable hours", "Unbillable hours"]},
+   filterMeasures: ["Rounded hours"],
    pageDimensions: ["Time", "Project Status", "Project Task", "Person"]},
 
   {name: "Sample linked hours by person",
@@ -84,6 +84,13 @@ var REPORTS = [
    columns: {measures: ["Billable hours", "Unbillable hours"]},
    filterMeasures: ["Rounded hours"],
    pageDimensions: ["Time", "Project Status", "Task", "Person"]},
+
+  {name: "Sample billable and unbillable hours by month",
+   cube: TIMESHEETS,
+   rows: {dimension: "Time", level: "Month"},
+   columns: {measures: ["Billable hours", "Unbillable hours"]},
+   pageDimensions: ["Time", "Project Status", "Project Task", "Person"],
+   pageMembers: ["[Time].[Last 12 months]"]},
 
   {name: "Sample hours by task and month",
    cube: TIMESHEETS,
@@ -248,7 +255,8 @@ describe("the sample reports of an imported Harvest account", () => {
   test("resolves the members the page filters of the reports start on", () => {
     var reports = REPORTS.filter((report) => report.pageMembers);
     expect(reports.map((report) => report.name)).
-      toEqual(["Sample utilisation by person", "Sample active projects status"]);
+      toEqual(["Sample utilisation by person", "Sample active projects status",
+               "Sample billable and unbillable hours by month"]);
     reports.forEach((report) => {
       expect(olap.results(`
         SELECT {[Measures].[Hours]} ON COLUMNS,

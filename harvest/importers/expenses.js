@@ -55,6 +55,7 @@ app.importers.expenses = {
     var userId = expense.user && expense.user.id;
     // An expense invoiced outside Harvest is marked as invoiced without an invoice.
     var invoiced = !!(expense.is_billed || (expense.invoice && expense.invoice.id));
+    var uninvoicedExpenses = (expense.billable && !invoiced) ? expense.total_cost : null;
 
     return {
       _source_id: String(expense.id),
@@ -74,6 +75,8 @@ app.importers.expenses = {
       // v2 answers the invoice of an expense as an object. The built-in Harvest application still reads
       // the `invoice_id` of v1, which v2 never answers, so its Invoiced expenses measure stays empty.
       invoiced_expenses: invoiced ? expense.total_cost : null,
+      uninvoiced_expenses: uninvoicedExpenses,
+      uninvoiced_amount_with_expenses: uninvoicedExpenses,
       notes: app.importers.rows.notesOf(expense)
     };
   }

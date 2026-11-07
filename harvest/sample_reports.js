@@ -17,7 +17,7 @@ app.defineSampleReports((samples) => {
     current_page_members: ["[Time].[All Times]"]
   };
 
-  // The shorter Time selection of the dashboard and of the report which has Time on rows as well.
+  // The shorter Time selection of the dashboard and of the reports which have Time on rows as well.
   var TIME_PAGE_SET = ["[Time].[All Times]", "[Time].[Last 12 months]", "[Time].[Current year]",
                        "[Time].[Previous year]"];
 
@@ -28,10 +28,12 @@ app.defineSampleReports((samples) => {
     current_page_members: ["[Time].[All Times]"]
   };
 
+  // The dashboard filter bar resolves the member it starts on from `members` and shows "(none)" without it.
   var TIME_PAGE_DASHBOARD = {
     name: "Time",
     selected_set: TIME_PAGE_SET,
-    current_page_members: ["[Time].[All Times]"]
+    current_page_members: ["[Time].[All Times]"],
+    members: [{full_name: "[Time].[All Times]", name: "All Times"}]
   };
 
   function measureFullName(name) {
@@ -102,7 +104,7 @@ app.defineSampleReports((samples) => {
     }
   });
 
-  // A person who writes a note on every entry is still listed, with Hours without notes 0.
+  // A person who writes a note on every entry is still listed, without Hours without notes.
   samples.report({
     name: "Sample hours without notes",
     cubeName: TIMESHEETS,
@@ -152,10 +154,10 @@ app.defineSampleReports((samples) => {
     folderName: folderName,
     resultView: "table",
     definition: {
-      columns: {dimensions: [measureColumns(["Hours", "Billable hours", "Unbillable hours"])]},
+      columns: {dimensions: [measureColumns(["Rounded hours", "Billable hours", "Unbillable hours"])]},
       rows: {
         dimensions: [{name: "External Item", selected_set: ["[External Item].[Service].Members"]}],
-        order_by: {expression: ["[Measures].[Hours]"], order: "DESC"}
+        order_by: {expression: ["[Measures].[Rounded hours]"], order: "DESC"}
       },
       pages: {dimensions: [TIME_PAGE].concat(allPages(["Project Status", "Project Task", "Person"]))},
       options: {nonempty: true},
@@ -196,7 +198,8 @@ app.defineSampleReports((samples) => {
         dimensions: [{name: "Person", selected_set: ["[Person].[Person].Members"]}],
         order_by: {expression: ["[Measures].[Utilisation %]"], order: "ASC"}
       },
-      // A page filter of calculated members lists the one it starts on in `members`, or shows "(none)".
+      // A report filter finds the member it starts on in `members`. Without it, the report opens on All Times,
+      // the first member of the selection.
       pages: {dimensions: [Object.assign({}, TIME_PAGE, {
         current_page_members: ["[Time].[Previous month]"],
         members: [{full_name: "[Time].[Previous month]", name: "Previous month"}]
@@ -237,12 +240,14 @@ app.defineSampleReports((samples) => {
                                              "Project currency"])]},
       rows: {dimensions: [{name: "Project Task", selected_set: ["[Project Task].[Project].Members"]}]},
       // The report is about the projects which are running, so its status filter starts on Active and
-      // offers the archived projects next to it. It has no Time filter: a budget is spent or it is not,
-      // whatever period the hours of it were tracked in.
+      // offers the archived projects next to it. The filter resolves Active from `members`, and without it
+      // the report opens on all projects. It has no Time filter: a budget is spent or it is not, whatever
+      // period the hours of it were tracked in.
       pages: {dimensions: [
         {name: "Project Status",
          selected_set: ["[Project Status].DefaultMember", "[Project Status].[Project Status].Members"],
-         current_page_members: ["[Project Status].[Active]"]}
+         current_page_members: ["[Project Status].[Active]"],
+         members: [{full_name: "[Project Status].[Active]", name: "Active"}]}
       ].concat(allPages(["Task", "Person"]))},
       options: {nonempty: true},
       view: {current: "table"}
@@ -265,6 +270,34 @@ app.defineSampleReports((samples) => {
       view: {
         current: "bar_chart",
         bar_chart: {stacked: true, vertical: false, series_options: {
+          "Billable hours": {color: samples.color("$green-6")},
+          "Unbillable hours": {color: samples.color("$neutral-3")}
+        }}
+      }
+    }
+  });
+
+  // The trend of the billable and the unbillable hours. It opens on the last 12 months and not on the whole
+  // history, because a chart of every month of an older account has too many columns to read.
+  samples.report({
+    name: "Sample billable and unbillable hours by month",
+    cubeName: TIMESHEETS,
+    folderName: folderName,
+    resultView: "bar_chart",
+    definition: {
+      columns: {dimensions: [measureColumns(["Billable hours", "Unbillable hours"])]},
+      // The months of the period the Time page filter selects. The rows start on the member the filter starts
+      // on, because they show the months of their own selection until the filter is changed.
+      rows: {dimensions: [{name: "Time", selected_set: ["[Time].[Last 12 months]"],
+                           selected_set_expression: "DescendantsSet({{selected_set}}, [Time].[Month])"}]},
+      pages: {dimensions: [Object.assign({}, TIME_PAGE_DUPLICATE, {
+        current_page_members: ["[Time].[Last 12 months]"],
+        members: [{full_name: "[Time].[Last 12 months]", name: "Last 12 months"}]
+      })].concat(allPages(["Project Status", "Project Task", "Person"]))},
+      options: {nonempty: true},
+      view: {
+        current: "bar_chart",
+        bar_chart: {stacked: true, vertical: true, series_options: {
           "Billable hours": {color: samples.color("$green-6")},
           "Unbillable hours": {color: samples.color("$neutral-3")}
         }}

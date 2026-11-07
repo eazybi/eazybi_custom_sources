@@ -367,18 +367,29 @@ app.defineSchema((schema) => {
       ],
       drill_through_default_measures: "[Measures].[Rounded hours],[Measures].[Expenses amount]"
     });
+    // Unbillable hours, Hours without notes, Unlinked hours and the Uninvoiced measures are stored and not
+    // calculated as differences of other measures. Detailed data rows of a stored measure lists only the
+    // rows where the measure is not empty, and Detailed data rows of a calculated measure lists every row
+    // of the cell. So a row stores such a value only when the row counts for the measure.
     c.measures((m) => {
       m.decimal("hours", {name: "Hours", formatString: "#,##0.00"});
       m.decimal("rounded_hours", {name: "Rounded hours", formatString: "#,##0.00"});
       m.decimal("billable_hours", {name: "Billable hours", formatString: "#,##0.00"});
+      m.decimal("unbillable_hours", {name: "Unbillable hours", formatString: "#,##0.00"});
       m.decimal("invoiced_hours", {name: "Invoiced hours", formatString: "#,##0.00"});
+      m.decimal("uninvoiced_hours", {name: "Uninvoiced hours", formatString: "#,##0.00"});
       m.decimal("budgeted_hours", {name: "Budgeted hours", formatString: "#,##0.00"});
       m.decimal("budgeted_cost", {name: "Budgeted cost", formatString: "#,##0.00"});
       m.decimal("billable_amount", {name: "Billable amount", formatString: "#,##0.00"});
       m.decimal("invoiced_amount", {name: "Invoiced amount", formatString: "#,##0.00"});
+      m.decimal("uninvoiced_amount", {name: "Uninvoiced amount", formatString: "#,##0.00"});
       m.decimal("expenses_amount", {name: "Expenses amount", formatString: "#,##0.00"});
       m.decimal("billable_expenses", {name: "Billable expenses", formatString: "#,##0.00"});
       m.decimal("invoiced_expenses", {name: "Invoiced expenses", formatString: "#,##0.00"});
+      m.decimal("uninvoiced_expenses", {name: "Uninvoiced expenses", formatString: "#,##0.00"});
+      // The uninvoiced amount of a time entry row, or the uninvoiced expenses of an expense row.
+      m.decimal("uninvoiced_amount_with_expenses",
+        {name: "Uninvoiced amount with expenses", formatString: "#,##0.00"});
       // The rounded hours at the cost rate of the person, in the currency of the Harvest account.
       m.decimal("cost_amount", {name: "Cost amount", formatString: "#,##0.00"});
       // The hours a person is available on a working day, a share of the weekly capacity of the person.
@@ -390,16 +401,14 @@ app.defineSchema((schema) => {
       // An expense row has no hours, so it adds nothing.
       m.decimalExpression(expr.caseNotNull("notes", "hours"),
         {name: "Hours with notes", formatString: "#,##0.00"});
+      m.decimal("hours_without_notes", {name: "Hours without notes", formatString: "#,##0.00"});
       m.decimalExpression(expr.caseNotNull("external_item_id", "hours"),
         {name: "Linked hours", formatString: "#,##0.00"});
+      m.decimal("unlinked_hours", {name: "Unlinked hours", formatString: "#,##0.00"});
       m.integer("generation");
     });
     c.timeDimensionCalculatedMembers();
 
-    c.calculatedMember("Unbillable hours", {
-      formula: "[Measures].[Rounded hours] - [Measures].[Billable hours]",
-      formatString: "#,##0.00"
-    });
     c.calculatedMember("Billable hours %", {
       formula: `
         IIF([Measures].[Rounded hours] > 0,
@@ -409,16 +418,6 @@ app.defineSchema((schema) => {
       formatString: "#0%",
       annotations: noDrillThrough
     });
-    // Only arithmetic of the stored measures, because Mondrian drills through no other formula, and a
-    // cell of it is drilled through to see the entries of the person.
-    c.calculatedMember("Hours without notes", {
-      formula: "[Measures].[Hours] - [Measures].[Hours with notes]",
-      formatString: "#,##0.00"
-    });
-    c.calculatedMember("Unlinked hours", {
-      formula: "[Measures].[Hours] - [Measures].[Linked hours]",
-      formatString: "#,##0.00"
-    });
     c.calculatedMember("Linked hours %", {
       formula: `
         IIF([Measures].[Hours] > 0,
@@ -427,22 +426,6 @@ app.defineSchema((schema) => {
         )`,
       formatString: "#0%",
       annotations: noDrillThrough
-    });
-    c.calculatedMember("Uninvoiced hours", {
-      formula: "[Measures].[Billable hours] - [Measures].[Invoiced hours]",
-      formatString: "#,##0.00"
-    });
-    c.calculatedMember("Uninvoiced amount", {
-      formula: "[Measures].[Billable amount] - [Measures].[Invoiced amount]",
-      formatString: "#,##0.00"
-    });
-    c.calculatedMember("Uninvoiced expenses", {
-      formula: "[Measures].[Billable expenses] - [Measures].[Invoiced expenses]",
-      formatString: "#,##0.00"
-    });
-    c.calculatedMember("Uninvoiced amount with expenses", {
-      formula: "[Measures].[Uninvoiced amount] + [Measures].[Uninvoiced expenses]",
-      formatString: "#,##0.00"
     });
 
     currencyConvertedMembers(c, "Billable amount");

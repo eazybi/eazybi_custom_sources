@@ -7,8 +7,9 @@ app.importers.timeEntries = {
   SOURCE_NAME: "time entry",
   // The sums of a row, which the two rows of a split entry share by the share of the time each row has.
   // The members and the notes are the same on both rows.
-  SPLIT_COLUMNS: ["hours", "rounded_hours", "billable_hours", "invoiced_hours", "billable_amount",
-                  "invoiced_amount", "cost_amount"],
+  SPLIT_COLUMNS: ["hours", "rounded_hours", "billable_hours", "unbillable_hours", "invoiced_hours",
+                  "uninvoiced_hours", "billable_amount", "invoiced_amount", "uninvoiced_amount",
+                  "uninvoiced_amount_with_expenses", "cost_amount", "hours_without_notes", "unlinked_hours"],
   // The decimal columns of the timesheet rows store two decimal places.
   DECIMAL_PLACES: 2,
 
@@ -162,6 +163,10 @@ app.importers.timeEntries = {
     // tracked; time which is already on an invoice is billable as well.
     var billable = entry.is_billed ||
       (typeof entry.billable === "boolean" ? entry.billable : !!(projectTask && projectTask.billable));
+    var uninvoiced = billable && !entry.is_billed;
+    var uninvoicedAmount = this.amountOf(uninvoiced, roundedHours, hourlyRate);
+    var notes = app.importers.rows.notesOf(entry);
+    var externalItemId = app.importers.externalItems.lookupId(entry);
 
     return {
       _source_id: String(entry.id),
@@ -173,19 +178,25 @@ app.importers.timeEntries = {
       person_id: app.importers.users.personIdOf(userId),
       currency_id: app.importers.currencies.lookupId(project.currency),
       approval_status_id: app.importers.approvalStatuses.lookupId(entry),
-      external_item_id: app.importers.externalItems.lookupId(entry),
+      external_item_id: externalItemId,
       // A spent date is a calendar date of the person who tracked it and is never shifted by a time zone.
       time_id: dwh.lookupDateId(entry, "spent_date"),
       hours: hours,
       rounded_hours: roundedHours,
       billable_hours: billable ? roundedHours : null,
+      unbillable_hours: billable ? null : roundedHours,
       invoiced_hours: entry.is_billed ? roundedHours : null,
+      uninvoiced_hours: uninvoiced ? roundedHours : null,
       billable_amount: this.amountOf(billable, roundedHours, hourlyRate),
       invoiced_amount: this.amountOf(entry.is_billed, roundedHours, hourlyRate),
+      uninvoiced_amount: uninvoicedAmount,
+      uninvoiced_amount_with_expenses: uninvoicedAmount,
       // The cost rate of the person when the time was tracked, which Harvest answers with the entry and
       // keeps in the currency of the account, whatever currency the project is billed in.
       cost_amount: this.amountOf(true, roundedHours, entry.cost_rate),
-      notes: app.importers.rows.notesOf(entry)
+      notes: notes,
+      hours_without_notes: notes === null ? hours : null,
+      unlinked_hours: externalItemId === null ? hours : null
     };
   },
 

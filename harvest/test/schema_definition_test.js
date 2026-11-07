@@ -54,14 +54,26 @@ describe("app.defineSchema", () => {
         toContain("Account currency");
     });
 
-    // Cost amount, Capacity hours, Hours with notes and Linked hours are the ones the built-in application
-    // does not have.
+    // Cost amount, Capacity hours and the hours with or without notes and linked or unlinked are the ones the
+    // built-in application does not have. Unbillable hours and the Uninvoiced measures are calculated
+    // measures there.
     test("defines the stored measures with their Harvest names", () => {
       expect(schema.cube(TIMESHEETS).measures()).toEqual([
-        "Hours", "Rounded hours", "Billable hours", "Invoiced hours", "Budgeted hours", "Budgeted cost",
-        "Billable amount", "Invoiced amount", "Expenses amount", "Billable expenses", "Invoiced expenses",
-        "Cost amount", "Capacity hours", "Notes", "Hours with notes", "Linked hours"
+        "Hours", "Rounded hours", "Billable hours", "Unbillable hours", "Invoiced hours", "Uninvoiced hours",
+        "Budgeted hours", "Budgeted cost", "Billable amount", "Invoiced amount", "Uninvoiced amount",
+        "Expenses amount", "Billable expenses", "Invoiced expenses", "Uninvoiced expenses",
+        "Uninvoiced amount with expenses", "Cost amount", "Capacity hours", "Notes", "Hours with notes",
+        "Hours without notes", "Linked hours", "Unlinked hours"
       ]);
+    });
+
+    // Detailed data rows of a calculated measure lists every row of the cell.
+    test("defines no calculated measure of the measures whose Detailed data rows lists the counting rows", () => {
+      var calculatedMembers = schema.cube(TIMESHEETS).calculatedMembers();
+      ["Unbillable hours", "Hours without notes", "Unlinked hours", "Uninvoiced hours", "Uninvoiced amount",
+       "Uninvoiced expenses", "Uninvoiced amount with expenses"].forEach((name) => {
+        expect(calculatedMembers).not.toContain(`[Measures].[${name}]`);
+      });
     });
 
     test("converts every amount of the cube into euro and into US dollars", () => {

@@ -86,6 +86,24 @@ describe("app.importers.expenses", () => {
       map((row) => row.billable_expenses)).toEqual([500, null, 500]);
   });
 
+  // Detailed data rows of a measure lists only the rows which store it, and an expense row is no time
+  // without notes even when the expense has no note.
+  test("stores the uninvoiced expenses only on the billable expenses which are not invoiced", () => {
+    importExpenses([expense({id: 1, billable: true}), expense({id: 2, billable: false, notes: null}),
+                    expense({id: 3, billable: true, is_billed: true})]);
+
+    expect(_.sortBy(expenseRows(["uninvoiced_expenses", "uninvoiced_amount_with_expenses",
+                                 "hours_without_notes", "unlinked_hours", "unbillable_hours"]),
+      (row) => row._source_id).map((row) => _.omit(row, "_source_name"))).toEqual([
+      {_source_id: "1", uninvoiced_expenses: 500, uninvoiced_amount_with_expenses: 500,
+       hours_without_notes: null, unlinked_hours: null, unbillable_hours: null},
+      {_source_id: "2", uninvoiced_expenses: null, uninvoiced_amount_with_expenses: null,
+       hours_without_notes: null, unlinked_hours: null, unbillable_hours: null},
+      {_source_id: "3", uninvoiced_expenses: null, uninvoiced_amount_with_expenses: null,
+       hours_without_notes: null, unlinked_hours: null, unbillable_hours: null}
+    ]);
+  });
+
   test("removes the row of an expense moved to a project which is not selected", () => {
     mock.sourceSelection(["project/1930109"]);
     importDimensions();

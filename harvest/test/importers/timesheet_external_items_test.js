@@ -95,6 +95,17 @@ describe("app.importers.externalItems", () => {
     ]);
   });
 
+  // Detailed data rows of Unlinked hours lists only the rows which store them.
+  test("stores the unlinked hours only on the rows of the entries without an item", () => {
+    importEntries([timeEntry({id: 1, notes: "HAR-31: Checkout page redesign",
+      external_reference: jiraReference("https://eazybi.atlassian.net/browse/HAR-31", "10131")}),
+                   timeEntry({id: 2, hours_without_timer: 3, rounded_hours: 3})]);
+
+    var unlinkedHours = dwh.measures.timesheets.rows({columns: ["_source_id", "_source_name", "unlinked_hours"]}).
+      filter((row) => row._source_name === "custom_harvest time entry");
+    expect(_.sortBy(unlinkedHours, (row) => row._source_id).map((row) => row.unlinked_hours)).toEqual([null, 3]);
+  });
+
   // A timer started on a board stores the board, which names the issue in its query.
   test("takes the issue key from the permalink when the notes do not start with it", () => {
     importEntries([timeEntry({notes: "Highrise integration", external_reference: jiraReference(

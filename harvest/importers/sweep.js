@@ -8,7 +8,7 @@
 // lists. The imports between two checks read only what changed and write the generation of the last
 // check. How often a check runs is set by the Check for deleted records import option, and a project taken
 // out of the selection or a selected project moved to another client makes the next import a check
-// (importers/selection.js).
+// (importers/selection.js), and so does a new version of the timesheet row columns (importer.js).
 //
 // A check which is interrupted leaves rows and members of the generation the next check writes. The
 // next check does not delete them first, which would empty the reports while it runs: what Harvest still
@@ -102,6 +102,13 @@ app.importers.sweep = {
     if (app.importers.capacity.yearDue(importStartedAt)) {
       logger.info("A new year began, so this import checks for deleted records and writes the capacity of " +
         "the people for it");
+      return true;
+    }
+    // Also with checks only with a full reimport: a full read without a check would keep the rows of a
+    // record deleted or moved out of the selection since the last import, without the new columns.
+    if (app.importer.rowColumnsChanged()) {
+      logger.info("The timesheet rows have new columns, so this import checks for deleted records and " +
+        "writes every time entry and expense again");
       return true;
     }
 

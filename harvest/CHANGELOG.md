@@ -4,6 +4,23 @@ All notable changes of the Harvest source application type are documented in thi
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and by
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-11-07
+
+### Added
+
+- Sample data, which shows the sample reports without a Harvest account.
+- Hourly imports on eazyBI Cloud paid plans.
+- The sample report Sample billable and unbillable hours by month.
+
+### Fixed
+
+- Detailed data rows of Unbillable hours, Hours without notes, Unlinked hours and the Uninvoiced
+  measures list only the rows that count for the measure. The first import after the update reads
+  all data again. If a report of your own uses one of these measures, delete the copy of the old
+  measure under User defined.
+- Sample active projects status opens on the active projects, Sample hours by external item shows
+  the rounded hours, and the Time filter of the Harvest overview dashboard shows All Times.
+
 ## [1.0.0] - 2026-10-06
 
 ### Added

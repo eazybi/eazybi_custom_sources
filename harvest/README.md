@@ -42,10 +42,13 @@ Archived projects are imported as well. To report on running projects only, sele
 | Business hours end | 17:00 | the end of the business hours |
 | Time dimension non-working days | Saturday, Sunday | the days that are not working days, also in the Working Time dimension and the capacity |
 
-Each import reads only what changed in Harvest since the previous import. Harvest does not report
-deleted records, so a check for deleted records reads all data again and removes what Harvest no
-longer has. Until the next check, a record deleted in Harvest still shows in reports. A check takes
-about as long as a full import. The first import and a full reimport always check.
+Each import reads the time entries, expenses and invoices only when they changed in Harvest since the
+previous import, and the clients, projects, tasks and people in full. eazyBI Cloud paid plans can
+therefore import the Harvest data every hour. Harvest does not report deleted records, so a check for
+deleted records reads all data again and removes what Harvest no longer has. Until the next check, a
+record deleted in Harvest still shows in reports. A check takes about as long as a full import. The
+first import and a full reimport always check. With imports every hour, the daily check runs in the
+first import after midnight UTC.
 
 ## What is imported
 
@@ -91,14 +94,15 @@ manager are under `(no manager)`.
 |---|---|
 | Hours | the tracked hours, without a timer that is still running |
 | Rounded hours | the hours rounded by the time rounding setting of your Harvest account |
-| Billable hours | the rounded hours of billable time entries (and of time that is already invoiced) |
-| Invoiced hours | the rounded hours that are on an invoice |
-| Billable amount, Invoiced amount | the billable and invoiced hours at the billable rate of each time entry |
+| Billable hours, Unbillable hours | the rounded hours of billable time entries (and of time that is already invoiced), and of the other time entries |
+| Invoiced hours, Uninvoiced hours | the rounded hours that are on an invoice, and the billable hours that are not |
+| Billable amount, Invoiced amount, Uninvoiced amount | the billable, invoiced and uninvoiced hours at the billable rate of each time entry |
 | Cost amount | the rounded hours at the person's cost rate, in the currency of your Harvest account |
-| Expenses amount, Billable expenses, Invoiced expenses | the expenses, the billable ones, and the part of them that is on an invoice or marked as invoiced |
+| Expenses amount, Billable expenses, Invoiced expenses, Uninvoiced expenses | the expenses, the billable ones, the part of them that is on an invoice or marked as invoiced, and the billable ones that are not |
+| Uninvoiced amount with expenses | the uninvoiced amount and the uninvoiced expenses together |
 | Budgeted hours, Budgeted cost | the budget of the project, of its tasks or of its people |
-| Hours with notes | the hours of time entries that have a note |
-| Linked hours | the hours of time entries linked to an item in another tool |
+| Hours with notes, Hours without notes | the hours of time entries that have a note, and of those that have none |
+| Linked hours, Unlinked hours | the hours of time entries linked to an item in another tool, and of those that are not |
 | Capacity hours | the hours a person is available, on every working day (see [Capacity and utilisation](#capacity-and-utilisation)) |
 
 **Rounded hours** is the value Harvest uses in its own reports, and all billable, invoiced and
@@ -106,8 +110,7 @@ amount measures are based on it: **Billable hours** + **Unbillable hours** = **R
 **Hours** for the raw tracked time. When you change the rounding setting in Harvest, earlier entries
 get their new rounded hours with the next check for deleted records or a full reimport.
 
-Also the calculated **Unbillable hours**, **Billable hours %**, **Hours without notes**, **Unlinked
-hours**, **Linked hours %**, the **Uninvoiced** hours, amount and expenses, **Budget spent %** of a
+Also the calculated **Billable hours %**, **Linked hours %**, **Budget spent %** of a
 project or task, **Margin EUR** and **USD** (the billable amount less the cost amount, without
 expenses), **Margin %**, **Utilisation %** and **Billable utilisation %**, and an **EUR** and **USD**
 version of every amount, so that projects billed in different currencies can be added up. The
@@ -255,9 +258,10 @@ name of the second one.
 
 In the **Harvest Timesheets** cube, **Detailed data rows** of a report cell lists the timesheet rows
 behind it: day, project, task, person, approval status, working time, external item and note. It is available for
-the stored measures and for Unbillable hours, Hours without notes and the Uninvoiced measures. It is
-not available for percentages, EUR and USD measures, margins and property measures. A time entry split
-into business and non-business hours is listed as two rows.
+the stored measures and lists only the rows that have a value of the measure: Hours without notes lists
+only the time entries without a note, and Uninvoiced expenses only the billable expenses that are not
+invoiced. It is not available for percentages, EUR and USD measures, margins and property measures. A
+time entry split into business and non-business hours is listed as two rows.
 
 ⚠️ **Notes are visible to everyone who can open the Harvest Timesheets cube.** Harvest shows a time
 entry and its note only to people who may see them, but eazyBI does not apply Harvest permissions.
@@ -283,6 +287,7 @@ overview** dashboard. Turn off the "import sample reports" option if you do not 
 | Sample uninvoiced hours and expenses | billable work and expenses of every client that are not invoiced yet |
 | Sample active projects status | running projects with their managers, hours, budget and budget spent |
 | Sample billable vs unbillable hours by project | a bar chart of billable and unbillable hours per project |
+| Sample billable and unbillable hours by month | a column chart of billable and unbillable hours per month of the last 12 months |
 | Sample hours by task and month | a pie chart of hours or the billable amount in EUR or USD per task, month by month |
 | Sample unpaid invoices | invoices that are not paid now, oldest first, with the amount still due |
 | Sample invoice amounts by month | a bar chart of invoiced amounts per month, by invoice status |

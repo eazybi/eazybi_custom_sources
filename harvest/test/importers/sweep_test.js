@@ -32,7 +32,7 @@ describe("app.importers.sweep", () => {
     });
 
     test("checks every day with the first import of a later day", () => {
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2"});
 
       expect(sweepDue("2026-09-22T23:59:59Z")).toBe(false);
       expect(sweepDue("2026-09-23T02:59:00Z")).toBe(true);
@@ -40,7 +40,7 @@ describe("app.importers.sweep", () => {
 
     test("checks every week with the first import seven days later", () => {
       mock.extraOptions({deleted_records_check: "weekly"});
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2"});
 
       expect(sweepDue("2026-09-28T23:59:59Z")).toBe(false);
       expect(sweepDue("2026-09-29T00:00:00Z")).toBe(true);
@@ -48,35 +48,37 @@ describe("app.importers.sweep", () => {
 
     test("checks only with a full reimport when the option says so", () => {
       mock.extraOptions({deleted_records_check: "reimport"});
-      mock.maxParams({generation: 1, sweep_at: "2025-01-01T00:00:00Z"});
+      mock.maxParams({generation: 1, sweep_at: "2025-01-01T00:00:00Z", row_columns: "2"});
 
       expect(sweepDue(CHECKED_AT)).toBe(false);
       expect(sweepDue(CHECKED_AT, {reimport: true})).toBe(true);
     });
 
     test("checks with a full reimport also on the day of the last check", () => {
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2"});
 
       expect(sweepDue(CHECKED_AT, {reimport: true})).toBe(true);
     });
 
     test("checks on the day of the last check when a project was taken out of the selection", () => {
       mock.extraOptions({deleted_records_check: "reimport"});
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, selection: "project/1,project/2",
-                      selection_clients: "10"});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2",
+                      selection: "project/1,project/2", selection_clients: "10"});
 
       expect(sweepDueOf(["project/1"])).toBe(true);
     });
 
     test("checks when a selection of projects replaced all projects", () => {
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, selection: "(all)", selection_clients: "(all)"});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2",
+                      selection: "(all)", selection_clients: "(all)"});
 
       expect(sweepDueOf(["project/1"])).toBe(true);
     });
 
     test("checks on the day of the last check when another client has selected projects", () => {
       mock.extraOptions({deleted_records_check: "reimport"});
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, selection: "project/1", selection_clients: "10"});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2",
+                      selection: "project/1", selection_clients: "10"});
 
       expect(sweepDueOf(["project/1"], [{id: 1, name: "Website", client: {id: 20, name: "Beta"}}])).
         toBe(true);
@@ -84,14 +86,14 @@ describe("app.importers.sweep", () => {
     });
 
     test("checks for a selection whose clients are not stored", () => {
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, selection: "project/1"});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2", selection: "project/1"});
 
       expect(sweepDueOf(["project/1"])).toBe(true);
     });
 
     test("does not check for the same selection, however ordered, nor for all projects", () => {
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, selection: "project/1,project/2",
-                      selection_clients: "10"});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2",
+                      selection: "project/1,project/2", selection_clients: "10"});
 
       expect(sweepDueOf(["project/2", "project/1"])).toBe(false);
       expect(sweepDueOf(["(all)", "project/1"])).toBe(false);
@@ -100,20 +102,30 @@ describe("app.importers.sweep", () => {
     test("checks with the two imports after a check which removed nothing", () => {
       mock.extraOptions({deleted_records_check: "reimport"});
 
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, sweep_pending: 2});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2", sweep_pending: 2});
       expect(sweepDue(CHECKED_AT)).toBe(true);
 
-      mock.maxParams({generation: 2, sweep_at: CHECKED_AT, sweep_pending: 1});
+      mock.maxParams({generation: 2, sweep_at: CHECKED_AT, row_columns: "2", sweep_pending: 1});
       expect(sweepDue(CHECKED_AT)).toBe(true);
 
-      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, sweep_pending: 0});
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "2", sweep_pending: 0});
       expect(sweepDue(CHECKED_AT)).toBe(false);
+    });
+
+    test("checks on the day of the last check when the timesheet rows have new columns", () => {
+      mock.extraOptions({deleted_records_check: "reimport"});
+
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT});
+      expect(sweepDue(CHECKED_AT)).toBe(true);
+
+      mock.maxParams({generation: 1, sweep_at: CHECKED_AT, row_columns: "1"});
+      expect(sweepDue(CHECKED_AT)).toBe(true);
     });
   });
 
   describe("begin", () => {
     test("writes the generation of the last check with an import which does not check", () => {
-      mock.maxParams({updated_at: CHECKED_AT, generation: 2, sweep_at: CHECKED_AT});
+      mock.maxParams({updated_at: CHECKED_AT, generation: 2, sweep_at: CHECKED_AT, row_columns: "2"});
 
       expect(begin(CHECKED_AT)).toEqual({sweeping: false, generation: 2});
     });

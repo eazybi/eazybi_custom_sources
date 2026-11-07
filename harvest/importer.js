@@ -6,6 +6,10 @@ app.importer = {
   // The max param of the Harvest features which were on at the last import, as comma separated names,
   // empty when neither was.
   FEATURES_PARAM: "features",
+  // The max param of the version of the timesheet row columns. Version 2 added the columns of the
+  // unbillable, uninvoiced and unlinked hours and amounts and of the hours without notes.
+  ROW_COLUMNS_PARAM: "row_columns",
+  ROW_COLUMNS_VERSION: "2",
 
   importAll() {
     // Captured before anything is read, so that nothing changed while the import runs is missed by the
@@ -45,6 +49,7 @@ app.importer = {
     if (source.warnings.objectFailures().length === 0) {
       source.setMaxParam("updated_at", this.markOf(importStartedAt));
       this.storeFeatures(shared);
+      this.storeRowColumns();
       app.importers.workingTimes.storeClassification();
       app.importers.selection.finish();
     }
@@ -73,6 +78,18 @@ app.importer = {
     if (shared.importInvoices) features.push("invoices");
     var value = features.join(",");
     if (value !== source.getMaxParam(this.FEATURES_PARAM)) source.setMaxParam(this.FEATURES_PARAM, value);
+  },
+
+  // Whether the stored timesheet rows were written by an earlier version of the columns. An incremental
+  // import writes only the rows of the records changed in Harvest, so the other rows would keep the new
+  // columns empty, and the first import after a change of the columns checks for deleted records
+  // (importers/sweep.js).
+  rowColumnsChanged() {
+    return source.getMaxParam(this.ROW_COLUMNS_PARAM) !== this.ROW_COLUMNS_VERSION;
+  },
+
+  storeRowColumns() {
+    if (this.rowColumnsChanged()) source.setMaxParam(this.ROW_COLUMNS_PARAM, this.ROW_COLUMNS_VERSION);
   },
 
   beginSelection() {

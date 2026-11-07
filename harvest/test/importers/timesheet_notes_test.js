@@ -136,12 +136,12 @@ describe("the notes of the timesheet rows", () => {
 describe("the Sample hours without notes report of an imported Harvest account", () => {
   beforeEach(mockHarvestAccount);
 
-  test("lists a person whose every entry has a note, with Hours without notes 0", () => {
+  test("lists a person whose every entry has a note, without Hours without notes", () => {
     mockTimeEntriesWithNotes(() => "Work");
 
     importRun.run();
 
-    expect(hoursOfPeople(REPORT_MEASURES)).toEqual([["Riley Smith", 80.1, 80.1, 0]]);
+    expect(hoursOfPeople(REPORT_MEASURES)).toEqual([["Riley Smith", 80.1, 80.1, null]]);
   });
 
   test("lists a person whose entries have no note, with all hours as Hours without notes", () => {
