@@ -2,7 +2,7 @@ app.defineApplication({
   key: "strava",
   name: "Strava",
   description: "Imports Strava activities, kilometer splits and heart rate zones from a Strava account export",
-  version: "1.1.0",
+  version: "1.2.0",
   author: "eazyBI",
   license: "MIT",
 

@@ -4,6 +4,17 @@ All notable changes of the Strava source application type are documented in this
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and by
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-11-07
+
+### Added
+
+- Generated sample data in `test/sample_data.js` — the account export of an invented athlete with a little
+  more than two years of runs, rides, walks, hikes and Nordic ski trips, their GPS tracks, heart rates and
+  gear — which imports with `eazybi custom-source-apps import-sample-data` and shows the sample reports
+  without a Strava export.
+- The eazyBI Marketplace description in `MARKETPLACE.md` with the screenshots of the sample reports
+  in `assets/`.
+
 ## [1.1.0] - 2026-10-14
 
 ### Added
