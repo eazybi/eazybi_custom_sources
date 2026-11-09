@@ -28,6 +28,17 @@ describe("app.importers.ratings", () => {
       expect(Object.keys(app.importers.ratings.byConversationId).sort()).toEqual(["500", "501"]);
     });
 
+    test("requests the ratings of each inbox on its own and remembers the inbox", () => {
+      mock.get("/v2/reports/happiness/ratings", {json: {results: [rating()], page: 1, pages: 1}});
+
+      expect(app.importers.ratings.fetchAll(["13", "14"], null, "2026-04-01T00:00:00Z")).toBe(2);
+
+      expect(mock.requests()[0].params.mailboxes).toBe("13");
+      expect(_.map(mock.requests(), (request) => request.params.mailboxes)).toContain("14");
+      expect(_.map(app.importers.ratings.byConversationId["500"], (one) => one.mailboxId)).
+        toEqual(["13", "14"]);
+    });
+
     test("requests the whole history when there is no lower bound", () => {
       mock.get("/v2/reports/happiness/ratings", {json: {results: [], page: 1, pages: 1}});
 
@@ -84,6 +95,33 @@ describe("app.importers.ratings", () => {
 
       expect(dwh.measures.conversations_ratings.rows({columns: ["_source_id", "ratings"]})).
         toEqual([{_source_id: "1002", ratings: 1}]);
+    });
+
+    test("keeps the inbox of a rating whose conversation was not part of this import", () => {
+      app.importers.mailboxes.reset();
+      app.importers.ratings.byConversationId["500"] = [rating({mailboxId: "13"})];
+
+      app.importers.ratings.importRemaining();
+
+      var inboxId = dwh.dimensions.mailboxes.lookupId({id: 13});
+      expect(inboxId).not.toBeNull();
+      expect(dwh.measures.conversations_ratings.rows({columns: ["mailbox_id"]})).
+        toEqual([{mailbox_id: inboxId}]);
+    });
+
+    test("finds and removes the ratings stored without an inbox", () => {
+      app.importers.mailboxes.reset();
+      app.importers.ratings.byConversationId["500"] = [rating()];
+      app.importers.ratings.byConversationId["501"] = [rating({threadid: 1003, id: 501, mailboxId: "13"})];
+      expect(app.importers.ratings.hasUnscopedRows()).toBe(false);
+
+      app.importers.ratings.importRemaining();
+
+      expect(app.importers.ratings.hasUnscopedRows()).toBe(true);
+      app.importers.ratings.removeUnscoped();
+      expect(app.importers.ratings.hasUnscopedRows()).toBe(false);
+      expect(dwh.measures.conversations_ratings.rows({columns: ["_source_id"]})).
+        toEqual([{_source_id: "1003"}]);
     });
 
     test("leaves out a skipped conversation absent from this import", () => {

@@ -4,6 +4,21 @@ All notable changes of the Help Scout source application type are documented in 
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and by
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2026-11-02
+
+### Fixed
+
+- Deselecting an inbox removes its conversations, messages and satisfaction ratings from the cube with
+  the next import, instead of leaving them next to the data of the selected inboxes. The rows are
+  removed only by an import that finished without failures, together with the stored selection. A
+  satisfaction rating keeps its inbox also when its conversation is not part of the import. The first
+  import after this version fetches the ratings of the selected inboxes from the start and stores
+  them again with their inbox, and removes the ratings that an earlier version stored without one
+  for inboxes that are not selected any more.
+- Selecting an inbox that was not imported before, or selecting every inbox after a selection of
+  inboxes, imports the history instead of only the changes since the last import. The first import
+  after this version does the same once, as the earlier selection was not remembered.
+
 ## [1.6.1] - 2026-10-24
 
 ### Added

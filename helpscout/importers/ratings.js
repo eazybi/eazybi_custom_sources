@@ -18,20 +18,38 @@ app.importers.ratings = {
     this.byConversationId = {};
   },
 
+  // One request per inbox, so that every rating knows its inbox: the report rows do not name it, and
+  // a rating written without its conversation could not be removed with the inbox otherwise.
   fetchAll(mailboxIds, start, end) {
     logger.startImport("ratings");
     var count = 0;
-    app.api.getHappinessRatings(mailboxIds, start || this.EARLIEST_START, end, (batch) => {
-      batch.forEach((rating) => {
-        source.checkCanceling();
-        var conversationKey = String(rating.id);
-        if (!this.byConversationId[conversationKey]) this.byConversationId[conversationKey] = [];
-        this.byConversationId[conversationKey].push(rating);
-        count++;
+    var requests = (mailboxIds && mailboxIds.length > 0) ?
+      mailboxIds.map((mailboxId) => ({mailboxId: String(mailboxId), mailboxIds: [mailboxId]})) :
+      [{mailboxId: null, mailboxIds: []}];
+    requests.forEach((request) => {
+      app.api.getHappinessRatings(request.mailboxIds, start || this.EARLIEST_START, end, (batch) => {
+        batch.forEach((rating) => {
+          source.checkCanceling();
+          rating.mailboxId = request.mailboxId;
+          var conversationKey = String(rating.id);
+          if (!this.byConversationId[conversationKey]) this.byConversationId[conversationKey] = [];
+          this.byConversationId[conversationKey].push(rating);
+          count++;
+        });
       });
     });
     logger.finishImport("ratings", count);
     return count;
+  },
+
+  // Whether ratings are stored without an inbox — what an earlier version wrote for the ratings of a
+  // conversation that was not part of the import.
+  hasUnscopedRows() {
+    return dwh.measures.conversations_ratings.selectCount({mailbox_id: null, _source_name: "rating"}) > 0;
+  },
+
+  removeUnscoped() {
+    dwh.measures.conversations_ratings.deleteRows({mailbox_id: null, _source_name: "rating"});
   },
 
   importAllOf(conversation, ids) {
@@ -69,6 +87,7 @@ app.importers.ratings = {
 
   fallbackIds(rating) {
     return {
+      mailbox_id: app.importers.mailboxes.lookupId(rating.mailboxId),
       conversation_id: dwh.dimensions.conversations.lookupId({id: rating.id}),
       channel_id: app.importers.statuses.lookupChannelId(rating.type),
       customer_id: rating.ratingCustomerId

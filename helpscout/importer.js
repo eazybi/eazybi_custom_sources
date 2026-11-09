@@ -3,11 +3,14 @@ app.importer = {
     // Captured before anything is fetched, so that nothing changed while the import runs is missed
     // by the next one.
     var importStartedAt = this.isoSeconds(new Date());
-    var since = source.isReimport() ? null : source.getMaxParam("modified_at");
+    var mailboxIds = source.getSourceSelection();
+    // An inbox added to the selection has no history yet, and the incremental mark of the inboxes
+    // imported before would skip it, so the import goes back to the start like a full reimport.
+    var since = (source.isReimport() || this.hasAddedMailboxes(mailboxIds)) ?
+      null : source.getMaxParam("modified_at");
     if (!since) since = this.historyStart();
     since = this.isoSeconds(since);
 
-    var mailboxIds = source.getSourceSelection();
     var shared = {
       since: since,
       importMessages: source.getExtraOption("import_messages"),
@@ -28,6 +31,7 @@ app.importer = {
     app.importers.statuses.importAll();
     app.importers.mailboxes.importAll();
     app.importers.users.importAll();
+    var mailboxes = app.importers.mailboxes.selected(mailboxIds);
 
     // After the inboxes: the custom field options are requested per inbox, and their members are
     // seeded before the conversations reference them.
@@ -39,16 +43,20 @@ app.importer = {
     // The customers importer sets its own status message, so that it can report its progress.
     app.importers.customers.importAll(since);
 
+    // Ratings stored by an earlier version have no inbox, so the rows of a deselected inbox cannot be
+    // told from the rest. Fetching the ratings of the selected inboxes from the start writes them
+    // again with their inbox, and the ones left without it are the ratings of deselected inboxes.
+    var repairRatings = shared.importRatings && app.importers.ratings.hasUnscopedRows();
     if (shared.importRatings) {
       source.setStatusMessage("Importing satisfaction ratings");
-      app.importers.ratings.fetchAll(mailboxIds, since, importStartedAt);
+      app.importers.ratings.fetchAll(mailboxes.map((mailbox) => mailbox.key),
+        repairRatings ? null : since, importStartedAt);
     }
 
     // One inbox at a time, so that the import log and the profiling results name the inbox whose
     // conversations took the time. The conversation importer counts into this object and reports it
     // after every page, so that the status message keeps moving through a large inbox instead of
     // standing still until the inbox is done; the percentage counts the inboxes.
-    var mailboxes = app.importers.mailboxes.selected(mailboxIds);
     var progress = {
       imported: 0,
       mailboxIndex: 0,
@@ -67,8 +75,34 @@ app.importer = {
 
     // The incremental mark may only advance when every conversation was imported — the next import
     // requests the same range again and retries the failed ones.
-    if (source.warnings.objectFailures().length === 0)
+    // The rows of the deselected inboxes are removed together with it, so that the stored selection
+    // always tells whose data the cube holds — a failed import keeps both as they were.
+    if (source.warnings.objectFailures().length === 0) {
+      app.importers.mailboxes.removeDeselectedData(mailboxIds);
+      if (repairRatings) app.importers.ratings.removeUnscoped();
       source.setMaxParam("modified_at", importStartedAt);
+      source.setMaxParam("selected_mailboxes", this.selectionKey(mailboxIds));
+    }
+  },
+
+  // The selection as one string that can be stored as a max param. "*" when every inbox is
+  // imported, so that it is told apart from any selection of inboxes.
+  selectionKey(mailboxIds) {
+    if (!mailboxIds || mailboxIds.length === 0) return "*";
+    return mailboxIds.map((mailboxId) => String(mailboxId)).sort().join(",");
+  },
+
+  // Whether the selection holds an inbox that the previous import did not — also when the inboxes
+  // were selected one by one and are all selected now. The import of a version that did not remember
+  // the selection leaves nothing to compare with, so it counts as an added inbox: one import goes
+  // back to the start, and the selection is remembered from then on.
+  hasAddedMailboxes(mailboxIds) {
+    var previous = source.getMaxParam("selected_mailboxes");
+    if (!previous) return true;
+    if (previous === "*") return false;
+    if (!mailboxIds || mailboxIds.length === 0) return true;
+    var previousIds = String(previous).split(",");
+    return mailboxIds.some((mailboxId) => previousIds.indexOf(String(mailboxId)) < 0);
   },
 
   // The conversation numbers the skip_conversations advanced setting names, so that an exceptional

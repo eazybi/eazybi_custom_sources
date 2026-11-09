@@ -410,7 +410,7 @@ describe("app.importer.importAll", () => {
     });
 
     test("continues from the stored mark on an incremental import", () => {
-      mock.maxParams({modified_at: "2026-03-02T00:00:00Z"});
+      mock.maxParams({modified_at: "2026-03-02T00:00:00Z", selected_mailboxes: "13"});
 
       importRun.run();
 
@@ -420,7 +420,7 @@ describe("app.importer.importAll", () => {
     });
 
     test("truncates the milliseconds of a stored mark left by an older version", () => {
-      mock.maxParams({modified_at: "2026-03-02T00:00:00.936Z"});
+      mock.maxParams({modified_at: "2026-03-02T00:00:00.936Z", selected_mailboxes: "13"});
 
       importRun.run();
 
@@ -430,7 +430,7 @@ describe("app.importer.importAll", () => {
     });
 
     test("ignores the stored mark on a reimport", () => {
-      mock.maxParams({modified_at: "2026-03-02T00:00:00Z"});
+      mock.maxParams({modified_at: "2026-03-02T00:00:00Z", selected_mailboxes: "13"});
 
       importRun.run({reimport: true});
 
@@ -446,6 +446,165 @@ describe("app.importer.importAll", () => {
 
       expect(importRun.objectFailures()).toEqual(["conversation/124"]);
       expect(importRun.maxParams().modified_at).toBeUndefined();
+    });
+  });
+
+  describe("of an import after the selected inbox was changed", () => {
+    var emptyConversations = {_embedded: {conversations: []},
+      page: {size: 50, totalElements: 0, totalPages: 0, number: 1}};
+
+    beforeAll(() => {
+      mockHelpScout();
+      importRun.run();
+      expect(dwh.measures.conversations.rows().length).toBeGreaterThan(0);
+
+      // Support is deselected and Sales selected, which has no conversations.
+      mock.sourceSelection(["14"]);
+      mock.get("/v2/conversations", {json: emptyConversations});
+      mock.get("/v2/reports/happiness/ratings", {json: {results: [], page: 1, pages: 1}});
+      importRun.run();
+    });
+
+    test("removes the conversations, messages and ratings of the deselected inbox", () => {
+      expect(dwh.measures.conversations.rows()).toEqual([]);
+      expect(dwh.measures.conversations_messages.rows()).toEqual([]);
+      expect(dwh.measures.conversations_ratings.rows()).toEqual([]);
+      expect(olap.results(`
+        SELECT [Inbox].[Inbox].Members ON ROWS,
+               {[Measures].[Conversations created]} ON COLUMNS
+        FROM [Help Scout]`)).toEqual([["Sales", null], ["Support", null]]);
+    });
+
+    test("remembers the selection of the import", () => {
+      expect(importRun.maxParams().selected_mailboxes).toBe("14");
+    });
+  });
+
+  describe("of a failed import after the selected inbox was changed", () => {
+    beforeAll(() => {
+      mockHelpScout();
+      importRun.run();
+
+      // Conversation 124 fails, so the selection of the import is not stored.
+      mock.sourceSelection(["14"]);
+      mock.get("/v2/conversations/124/threads", {status: 404, json: {message: "Not found"}});
+      importRun.run();
+    });
+
+    test("keeps the rows of the inbox and the stored selection as they were", () => {
+      expect(importRun.objectFailures()).toEqual(["conversation/124"]);
+      expect(importRun.maxParams().selected_mailboxes).toBe("13");
+      // The failed conversation was not imported again, and its rows of the first import stay.
+      var failedRows = _.filter(dwh.measures.conversations.rows({columns: ["_source_id"]}),
+        (row) => row._source_id === "124");
+      expect(failedRows.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("of an import after ratings were stored without an inbox", () => {
+    var emptyConversations = {_embedded: {conversations: []},
+      page: {size: 50, totalElements: 0, totalPages: 0, number: 1}};
+
+    function importWithUnscopedRating() {
+      mockHelpScout();
+      importRun.run();
+      // What an earlier version stored for a rating of a conversation outside the import: the
+      // conversation, channel and customer, but no inbox.
+      importRun.prepare();
+      var legacyRow = app.importers.ratings.buildRow(
+        mock.fixture("happiness_ratings").results[0], {conversation_id: 123});
+      dwh.measures.conversations_ratings.importRows([legacyRow]);
+      expect(app.importers.ratings.hasUnscopedRows()).toBe(true);
+    }
+
+    describe("of the same selection", () => {
+      beforeAll(() => {
+        importWithUnscopedRating();
+        mock.maxParams({modified_at: "2026-03-02T00:00:00Z", selected_mailboxes: "13"});
+        importRun.run();
+      });
+
+      test("fetches the ratings from the start and stores them with their inbox", () => {
+        var ratingsRequest = _.find(mock.requests(),
+          (request) => request.path === "/v2/reports/happiness/ratings");
+        expect(ratingsRequest.params.start).toBe(app.importers.ratings.EARLIEST_START);
+        expect(app.importers.ratings.hasUnscopedRows()).toBe(false);
+        var inboxId = dwh.dimensions.mailboxes.lookupId({id: 13});
+        expect(dwh.measures.conversations_ratings.rows({columns: ["mailbox_id"]})).
+          toEqual([{mailbox_id: inboxId}]);
+      });
+    });
+
+    describe("of another selection", () => {
+      beforeAll(() => {
+        importWithUnscopedRating();
+        mock.sourceSelection(["14"]);
+        mock.get("/v2/conversations", {json: emptyConversations});
+        mock.get("/v2/reports/happiness/ratings", {json: {results: [], page: 1, pages: 1}});
+        importRun.run();
+      });
+
+      test("removes the ratings of the deselected inbox that have no inbox", () => {
+        expect(dwh.measures.conversations_ratings.rows()).toEqual([]);
+      });
+    });
+  });
+
+  describe("of an import with an inbox added to the selection", () => {
+    beforeEach(() => {
+      mockHelpScout();
+      mock.maxParams({modified_at: "2026-03-02T00:00:00Z", selected_mailboxes: "14"});
+    });
+
+    test("imports the history of the added inbox instead of continuing from the mark", () => {
+      importRun.run();
+
+      var conversationRequest = _.find(mock.requests(),
+        (request) => request.path === "/v2/conversations");
+      expect(conversationRequest.params.modifiedSince).toBeUndefined();
+    });
+
+    test("imports the history when every inbox is selected after a selection of inboxes", () => {
+      mock.sourceSelection([]);
+
+      importRun.run();
+
+      var conversationRequest = _.find(mock.requests(),
+        (request) => request.path === "/v2/conversations");
+      expect(conversationRequest.params.modifiedSince).toBeUndefined();
+      expect(importRun.maxParams().selected_mailboxes).toBe("*");
+    });
+
+    test("continues from the mark while every inbox stays selected", () => {
+      mock.sourceSelection([]);
+      mock.maxParams({modified_at: "2026-03-02T00:00:00Z", selected_mailboxes: "*"});
+
+      importRun.run();
+
+      var conversationRequest = _.find(mock.requests(),
+        (request) => request.path === "/v2/conversations");
+      expect(conversationRequest.params.modifiedSince).toBe("2026-03-02T00:00:00Z");
+    });
+
+    test("imports the history when the selection of the previous import was not remembered", () => {
+      mock.maxParams({modified_at: "2026-03-02T00:00:00Z"});
+
+      importRun.run();
+
+      var conversationRequest = _.find(mock.requests(),
+        (request) => request.path === "/v2/conversations");
+      expect(conversationRequest.params.modifiedSince).toBeUndefined();
+      expect(importRun.maxParams().selected_mailboxes).toBe("13");
+    });
+
+    test("continues from the mark when the selection is unchanged", () => {
+      mock.maxParams({modified_at: "2026-03-02T00:00:00Z", selected_mailboxes: "13"});
+
+      importRun.run();
+
+      var conversationRequest = _.find(mock.requests(),
+        (request) => request.path === "/v2/conversations");
+      expect(conversationRequest.params.modifiedSince).toBe("2026-03-02T00:00:00Z");
     });
   });
 

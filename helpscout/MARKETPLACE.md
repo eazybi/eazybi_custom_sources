@@ -8,6 +8,10 @@ Analyze the conversations of your Help Scout inboxes in eazyBI and see how your 
 - Follow customer happiness from the satisfaction ratings of the agent replies.
 - Find when your customers write in, and how many messages it takes to close a conversation.
 
+The eazyBI support team built this app to analyze its own Help Scout data. Read
+[How We Measure Our Support, and How You Can Too](https://eazybi.com/blog/how-we-measure-our-support-and-how-you-can-too)
+to see the reports it uses.
+
 ## Sample reports
 
 ### Conversations by inbox
