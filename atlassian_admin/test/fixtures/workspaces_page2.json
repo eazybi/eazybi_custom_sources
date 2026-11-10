@@ -1,0 +1,130 @@
+{
+  "data": [
+    {
+      "id": "ari:cloud:jira-software::site/site-beta",
+      "type": "workspaces",
+      "attributes": {
+        "name": "beta",
+        "typeKey": "jira-software",
+        "type": "Jira Software",
+        "status": "online",
+        "hostUrl": "https://beta.atlassian.net",
+        "capacity": 50,
+        "createdAt": "2024-11-20T08:00:00Z",
+        "realm": "eu"
+      },
+      "relationships": {
+        "entitlement": [
+          {
+            "id": "ent-beta-jira",
+            "type": "entitlements",
+            "attributes": {
+              "key": "jira-software.ondemand",
+              "planKey": "standard",
+              "plan": "Standard"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ari:cloud:jira-software::site/site-gamma",
+      "type": "workspaces",
+      "attributes": {
+        "name": "gamma",
+        "typeKey": "jira-software",
+        "type": "Jira Software",
+        "status": "online",
+        "hostUrl": "https://gamma.atlassian.net",
+        "capacity": 10,
+        "createdAt": "2026-01-10T12:00:00Z",
+        "realm": "us"
+      },
+      "relationships": {
+        "entitlement": [
+          {
+            "id": "ent-gamma-jira",
+            "type": "entitlements",
+            "attributes": {
+              "key": "jira-software.ondemand",
+              "planKey": "free",
+              "plan": "Free"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ari:cloud:jira::site/site-acme",
+      "type": "workspaces",
+      "attributes": {
+        "name": "acme",
+        "typeKey": "jira",
+        "type": "Jira",
+        "status": "online",
+        "hostUrl": "https://acme.atlassian.net",
+        "realm": "us"
+      },
+      "relationships": {
+        "entitlement": [
+          {
+            "id": "ent-acme-jira-platform",
+            "type": "entitlements",
+            "attributes": {
+              "key": "jira.ondemand",
+              "planKey": "none",
+              "plan": "None"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ari:cloud:trello::workspace/ws-trello",
+      "type": "workspaces",
+      "attributes": {
+        "name": "Acme Trello",
+        "typeKey": "trello",
+        "type": "Trello",
+        "status": "online",
+        "hostUrl": null,
+        "realm": "us"
+      },
+      "relationships": {}
+    },
+    {
+      "id": "ari:cloud:bitbucket::workspace/ws-bitbucket",
+      "type": "workspaces",
+      "attributes": {
+        "name": "Acme Dev",
+        "typeKey": "bitbucket",
+        "type": "Bitbucket",
+        "status": "online",
+        "hostUrl": "https://bitbucket.org/acme-dev/",
+        "capacity": 5,
+        "createdAt": "2025-09-01T10:00:00Z",
+        "realm": "us"
+      },
+      "relationships": {
+        "entitlement": [
+          {
+            "id": "ent-bitbucket",
+            "type": "entitlements",
+            "attributes": {
+              "key": "bitbucket",
+              "planKey": "standard",
+              "plan": "Standard"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "links": {
+    "self": "https://api.atlassian.com/admin/v2/orgs/org-1/workspaces?cursor=WSCURSOR2"
+  },
+  "meta": {
+    "pageSize": 4,
+    "total": 6
+  }
+}

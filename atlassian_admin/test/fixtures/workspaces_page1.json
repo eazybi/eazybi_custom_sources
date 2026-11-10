@@ -1,0 +1,106 @@
+{
+  "data": [
+    {
+      "id": "ari:cloud:jira-software::site/site-acme",
+      "type": "workspaces",
+      "attributes": {
+        "name": "acme",
+        "typeKey": "jira-software",
+        "type": "Jira Software",
+        "status": "online",
+        "hostUrl": "https://acme.atlassian.net",
+        "capacity": 10,
+        "createdAt": "2025-05-01T10:00:00Z",
+        "realm": "us"
+      },
+      "relationships": {
+        "entitlement": [
+          {
+            "id": "ent-acme-jira",
+            "type": "entitlements",
+            "attributes": {
+              "key": "jira-software.ondemand",
+              "planKey": "free",
+              "plan": "Free"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ari:cloud:confluence::site/site-acme",
+      "type": "workspaces",
+      "attributes": {
+        "name": "acme",
+        "typeKey": "confluence",
+        "type": "Confluence",
+        "status": "online",
+        "hostUrl": "https://acme.atlassian.net/wiki",
+        "capacity": 25,
+        "createdAt": "2025-06-15T09:00:00Z",
+        "realm": "us"
+      },
+      "relationships": {
+        "entitlement": [
+          {
+            "id": "ent-acme-confluence",
+            "type": "entitlements",
+            "attributes": {
+              "key": "confluence.ondemand",
+              "planKey": "standard",
+              "plan": "Standard"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ari:cloud:cmdb::site/site-acme",
+      "type": "workspaces",
+      "attributes": {
+        "name": "acme",
+        "typeKey": "cmdb",
+        "type": "Assets",
+        "status": "online",
+        "hostUrl": "https://acme.atlassian.net/jira/assets",
+        "createdAt": "2025-07-01T10:00:00Z",
+        "realm": "us"
+      },
+      "relationships": {
+        "entitlement": [
+          {
+            "id": "ent-acme-assets",
+            "type": "entitlements",
+            "attributes": {
+              "key": "cmdb.ondemand",
+              "planKey": "free",
+              "plan": "Free"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ari:cloud:beacon::site/site-acme",
+      "type": "workspaces",
+      "attributes": {
+        "name": "acme",
+        "typeKey": "beacon",
+        "type": "Beacon",
+        "status": "online",
+        "hostUrl": "https://detect.atlassian.com/w/acme-beacon",
+        "createdAt": "2025-08-01T10:00:00Z",
+        "realm": "us"
+      },
+      "relationships": {}
+    }
+  ],
+  "links": {
+    "self": "https://api.atlassian.com/admin/v2/orgs/org-1/workspaces",
+    "next": "https://api.atlassian.com/admin/v2/orgs/org-1/workspaces?cursor=WSCURSOR2"
+  },
+  "meta": {
+    "pageSize": 2,
+    "total": 6
+  }
+}

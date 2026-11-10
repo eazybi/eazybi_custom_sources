@@ -1,0 +1,6 @@
+{
+  "data": [
+    {"directoryId": "dir-1", "name": "Managed accounts"}
+  ],
+  "links": {"self": "https://api.atlassian.com/admin/v2/orgs/org-1/directories"}
+}

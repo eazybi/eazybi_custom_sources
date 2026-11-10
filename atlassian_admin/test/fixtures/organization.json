@@ -1,0 +1,8 @@
+{
+  "data": {
+    "id": "org-1",
+    "type": "orgs",
+    "attributes": {"name": "Acme Org"},
+    "links": {"self": "https://api.atlassian.com/admin/v1/orgs/org-1"}
+  }
+}

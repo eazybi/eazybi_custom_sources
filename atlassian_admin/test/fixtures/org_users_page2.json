@@ -1,0 +1,32 @@
+{
+  "data": [
+    {
+      "account_id": "acc-carol",
+      "account_type": "atlassian",
+      "account_status": "inactive",
+      "name": "Carol Gone",
+      "email": "carol@acme.com",
+      "access_billable": false,
+      "product_access": []
+    },
+    {
+      "account_id": "acc-dave",
+      "account_type": "atlassian",
+      "account_status": "active",
+      "name": "Dave Distant",
+      "email": "dave@acme.com",
+      "access_billable": true,
+      "last_active": "2026-06-01T10:00:00Z",
+      "product_access": [
+        {
+          "key": "jira-software",
+          "name": "Jira Software",
+          "url": "https://gamma.atlassian.net",
+          "last_active": "2026-06-01T10:00:00Z"
+        }
+      ]
+    }
+  ],
+  "links": {"self": "https://api.atlassian.com/admin/v1/orgs/org-1/users?cursor=USERSCURSOR2"},
+  "meta": {"total": 4}
+}

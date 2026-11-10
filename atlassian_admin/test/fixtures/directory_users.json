@@ -1,0 +1,98 @@
+{
+  "data": [
+    {
+      "accountId": "acc-alice",
+      "accountType": "atlassian",
+      "accountStatus": "active",
+      "status": "active",
+      "name": "Alice Admin",
+      "email": "alice@acme.com",
+      "department": "Support",
+      "jobTitle": "Support Engineer",
+      "organization": "Acme",
+      "location": "Riga",
+      "timeZone": "Europe/Riga",
+      "mfaEnabled": true,
+      "emailVerified": true,
+      "claimStatus": "claimed",
+      "managementSource": "synced",
+      "addedToOrg": "2024-02-01T10:00:00Z",
+      "platformRoles": [
+        "atlassian/org-admin"
+      ],
+      "groups": [
+        {
+          "id": "ari:cloud:identity::group/11111111-aaaa-bbbb-cccc-000000000001",
+          "name": "org-admins"
+        }
+      ],
+      "productAccess": [
+        {
+          "key": "jira-software",
+          "id": "ari:cloud:jira-software::site/site-acme",
+          "lastActiveTimestamp": "2026-09-10T12:00:00Z"
+        },
+        {
+          "key": "jira-core",
+          "id": "ari:cloud:jira-core::site/site-acme",
+          "lastActiveTimestamp": "2026-08-20T12:00:00Z"
+        },
+        {
+          "key": "jira-software",
+          "id": "ari:cloud:jira-software::site/site-beta",
+          "lastActiveTimestamp": "2026-08-01T09:00:00Z"
+        },
+        {
+          "key": "assets",
+          "id": "ari:cloud:assets::site/site-acme",
+          "lastActiveTimestamp": "2026-09-05T10:00:00Z"
+        },
+        {
+          "key": "trello",
+          "id": "ari:cloud:trello::workspace/ws-trello",
+          "lastActiveTimestamp": "2026-07-15T16:30:00Z"
+        },
+        {
+          "key": "bitbucket",
+          "id": "ari:cloud:bitbucket::workspace/ws-bitbucket",
+          "lastActiveTimestamp": "2026-07-01T10:00:00Z"
+        }
+      ]
+    },
+    {
+      "accountId": "acc-bob",
+      "accountType": "atlassian",
+      "accountStatus": "active",
+      "status": "active",
+      "name": "Bob Builder",
+      "email": "bob@acme.com",
+      "department": "Development",
+      "mfaEnabled": false,
+      "claimStatus": "unclaimed",
+      "managementSource": "invited",
+      "addedToOrg": "2025-03-05T09:00:00Z",
+      "platformRoles": [],
+      "groups": [
+        {
+          "id": "ari:cloud:identity::group/11111111-aaaa-bbbb-cccc-000000000002",
+          "name": "developers"
+        }
+      ],
+      "productAccess": []
+    },
+    {
+      "accountId": "acc-carol",
+      "accountType": "atlassian",
+      "accountStatus": "inactive",
+      "status": "deactivated",
+      "name": "Carol Gone",
+      "email": "carol@acme.com",
+      "platformRoles": [],
+      "groups": [],
+      "productAccess": []
+    }
+  ],
+  "links": {
+    "self": "https://api.atlassian.com/admin/v2/orgs/org-1/directories/dir-1/users/search"
+  }
+}

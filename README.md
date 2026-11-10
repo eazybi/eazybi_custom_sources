@@ -13,6 +13,7 @@ the history of this repository has one commit per published version.
 
 | App | Imports |
 |---|---|
+| [atlassian_admin](atlassian_admin/README.md) | [Atlassian](https://www.atlassian.com/) organization users, roles, groups, product activity and license usage |
 | [atlassian_marketplace](atlassian_marketplace/README.md) | [Atlassian Marketplace](https://marketplace.atlassian.com/) app licenses and sales transactions of a vendor |
 | [github](github/README.md) | [GitHub](https://github.com/) pull requests, their comments, reviews, commits and state transitions |
 | [harvest](harvest/README.md) | [Harvest](https://www.getharvest.com/) clients, projects, people, timesheet entries, expenses and invoices |

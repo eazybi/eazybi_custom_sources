@@ -1,0 +1,5 @@
+{
+  "data": [],
+  "links": {"self": "https://api.atlassian.com/admin/v1/orgs/org-1/users"},
+  "meta": {"total": 0}
+}

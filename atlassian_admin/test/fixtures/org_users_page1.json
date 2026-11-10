@@ -1,0 +1,55 @@
+{
+  "data": [
+    {
+      "account_id": "acc-alice",
+      "account_type": "atlassian",
+      "account_status": "active",
+      "name": "Alice Admin",
+      "email": "alice@acme.com",
+      "access_billable": true,
+      "last_active": "2026-09-10T12:00:00Z",
+      "product_access": [
+        {
+          "key": "jira-software",
+          "name": "Jira Software",
+          "url": "https://acme.atlassian.net",
+          "last_active": "2026-09-10T12:00:00Z"
+        },
+        {
+          "key": "jira-software",
+          "name": "Jira Software",
+          "url": "https://beta.atlassian.net",
+          "last_active": "2026-08-01T09:00:00Z"
+        },
+        {
+          "key": "trello",
+          "name": "Trello",
+          "url": "https://trello.com/w/acme",
+          "last_active": "2026-07-15T16:30:00Z"
+        }
+      ]
+    },
+    {
+      "account_id": "acc-bob",
+      "account_type": "atlassian",
+      "account_status": "active",
+      "name": "Bob Builder",
+      "email": "bob@acme.com",
+      "access_billable": true,
+      "last_active": "2026-09-01T08:00:00Z",
+      "product_access": [
+        {
+          "key": "jira",
+          "name": "Jira",
+          "url": "https://acme.atlassian.net",
+          "last_active": "2026-09-01T08:00:00Z"
+        }
+      ]
+    }
+  ],
+  "links": {
+    "self": "https://api.atlassian.com/admin/v1/orgs/org-1/users",
+    "next": "https://api.atlassian.com/admin/v1/orgs/org-1/users?cursor=USERSCURSOR2"
+  },
+  "meta": {"total": 4}
+}
