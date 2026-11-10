@@ -9,7 +9,11 @@
 var IMPORTED_REPOSITORIES_MAX_PARAM = "imported_repositories";
 var IMPORTED_REPOSITORIES_CHUNKS = 10;
 var MAX_PARAM_VALUE_LENGTH = 1000;
-var ALL_REPOSITORIES_KEY = "all";
+// What Select all of the source selection stores, also for the repositories created later.
+var ALL_REPOSITORIES_KEY = "(all)";
+// The key of the "(all repositories)" option of version 1.0.0, which Select all replaced. A selection
+// saved with it would import only its other keys and delete the data of every other repository.
+var REMOVED_ALL_REPOSITORIES_KEY = "all";
 var OWNER_KEY_PREFIX = "owner/";
 
 // The progress weight of a repository which keeps its incremental mark — not its whole history, and not
@@ -21,6 +25,11 @@ var PULL_REQUESTS_PER_PROGRESS_LOG = 500;
 
 app.importer = {
   importAll() {
+    if (source.getSourceSelection().indexOf(REMOVED_ALL_REPOSITORIES_KEY) >= 0) {
+      throw new Error("The repository selection contains the removed \"(all repositories)\" option." +
+        " Select the repositories again.");
+    }
+
     source.setStatusMessage("Importing GitHub repositories");
     // Captured before anything is fetched, so that the next incremental import does not miss a pull
     // request that was updated while this import was running. Truncated to the whole second, because

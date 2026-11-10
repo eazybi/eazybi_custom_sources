@@ -4,6 +4,28 @@ All notable changes of the GitHub source application type are documented in this
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and by
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-11-09
+
+### Added
+
+- Generated sample data in `test/sample_data.js` — two years of the pull requests, reviews,
+  comments, commits and state transitions of six repositories of an invented software company,
+  with a dependency update bot and a review bot next to its developers — which imports with
+  `eazybi custom-source-apps import-sample-data` and shows the sample reports without a GitHub
+  account.
+- The eazyBI Marketplace description in `MARKETPLACE.md` with the screenshots of the sample reports
+  in `assets/`.
+- The app declares its incremental imports, so the regular import can run every hour in eazyBI
+  Cloud plans that allow hourly imports.
+
+### Changed
+
+- All repositories are selected with Select all of the source selection, which includes the
+  repositories the token can read later, instead of the "(all repositories)" option of the list. The
+  import of a source application that selected that option fails, without changing its data, until
+  its repositories are selected again. Select all is not offered on an eazyBI plan which allows only
+  one selected source.
+
 ## [1.0.0] - 2026-09-14
 
 The first version of the application.

@@ -80,7 +80,8 @@ app.api = {
 
   getSourceSelections() {
     var repositories = this.getRepositories();
-    var options = [{key: "all", name: "(all repositories)"}];
+    // Select all of eazyBI adds its own (all) option, see importer.selectedRepositories.
+    var options = [];
 
     this.repositoryOwners(repositories).forEach((owner) => {
       options.push({key: `owner/${owner.id}`, name: `${owner.login} (all repositories)`});

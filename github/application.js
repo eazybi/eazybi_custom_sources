@@ -3,7 +3,7 @@ app.defineApplication({
   name: "GitHub",
   description: "Imports GitHub pull requests with their authors, assignees, reviewers, labels, milestones," +
     " comments, commits and state transitions.",
-  version: "1.0.0",
+  version: "1.1.0",
   author: "eazyBI",
   license: "MIT",
   defaultCubeName: "GitHub",
@@ -21,7 +21,8 @@ app.defineApplication({
     }
   ],
   auth: {type: "header", headerName: "Authorization", headerValue: "Bearer {{params.api_token}}"},
-  sourceSelection: {enabled: true},
+  incrementalImport: true,
+  sourceSelection: {enabled: true, all: true},
   extraOptions: [
     {
       key: "import_commits",

@@ -177,6 +177,32 @@ describe("app.importer.importAll", () => {
     });
   });
 
+  describe("of Select all", () => {
+    test("imports every repository the token can read", () => {
+      mockSelectedRepository();
+      mock.sourceSelection(["(all)"]);
+      mock.graphql({query: "PullRequests", json: {data: {repository: {pullRequests:
+        {nodes: [], pageInfo: {hasNextPage: false, endCursor: null}}}}}});
+
+      importRun.run();
+
+      expect(dwh.dimensions.repositories.rows({columns: ["repository_slug"], orderBy: "repository_slug"})).
+        toEqual([{repository_slug: "acme/app"}, {repository_slug: "acme/tools"}, {repository_slug: "dana/notes"}]);
+    });
+  });
+
+  describe("of a selection with the removed all repositories option", () => {
+    test("fails before it deletes the data of the repositories it does not name", () => {
+      mockSelectedRepository();
+      importRun.run();
+      mock.sourceSelection(["all", "102"]);
+
+      expect(() => importRun.run()).toThrow("removed \"(all repositories)\" option");
+      expect(dwh.dimensions.repositories.rows({columns: ["external_id"]})).toEqual([{external_id: 101}]);
+      expect(dwh.dimensions.pull_requests.rows()).toHaveLength(2);
+    });
+  });
+
   describe("of a repository owner", () => {
     test("imports every repository of the selected owner", () => {
       mockSelectedRepository();

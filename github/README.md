@@ -11,8 +11,10 @@ long pull requests wait in each state. The installed source application type is 
    - a **fine grained** token needs read access to Metadata, Contents, Pull requests, Issues and Email
      addresses of the repositories to import.
 2. Paste it into the **API token** field of the eazyBI connection form.
-3. Select the repositories to import — individually, by owner, or all of them. An owner selection
-   includes the repositories added to that owner later.
+3. Select the repositories to import — individually, by owner, or all of them with Select all. An owner
+   selection includes the repositories added to that owner later, and Select all includes every
+   repository the token can read later. Select all is not offered on an eazyBI plan which allows only
+   one selected source.
 
 A token missing a scope fails every import rather than importing less — GitHub rejects the whole query,
 not just the fields the scope protects. The connection test asks for the same account fields as the
@@ -162,7 +164,8 @@ of a repository do, above all in code review, and not as the share of the code a
 
 Each import reads the pull requests that changed since the previous one and re-imports each of them as a
 whole, so their measures always match their current state on GitHub. The mark is taken before anything is
-fetched, so a pull request updated while an import runs is read by the next one.
+fetched, so a pull request updated while an import runs is read by the next one. Because an import reads
+only the changes, the regular import can run every hour in eazyBI Cloud plans that allow hourly imports.
 
 The mark is kept per repository and moves only when that repository finished. A repository that fails is
 read again at the end of the same import, and only if it fails a second time is it reported as a failed

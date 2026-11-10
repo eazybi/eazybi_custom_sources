@@ -61,14 +61,13 @@ describe("app.api", () => {
   });
 
   describe("getSourceSelections", () => {
-    test("offers all repositories, every owner and every repository", () => {
+    test("offers every owner and every repository", () => {
       mock.get("/user/repos", {fixture: "repositories"});
 
       var selections = app.api.getSourceSelections();
 
       expect(selections.multiple).toBe(true);
       expect(selections.options).toEqual([
-        {key: "all", name: "(all repositories)"},
         {key: "owner/11", name: "acme (all repositories)"},
         {key: "owner/21", name: "dana (all repositories)"},
         {key: "101", name: "acme/app"},
