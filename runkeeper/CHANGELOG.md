@@ -4,6 +4,13 @@ All notable changes of the Runkeeper source application type are documented in t
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and by
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-11-10
+
+### Fixed
+
+- The sample data has a ski trip in every winter month. On some days it had none in the last 12 months,
+  so the sample reports showed no skiing and the sample data test failed.
+
 ## [1.0.1] - 2026-10-24
 
 ### Added

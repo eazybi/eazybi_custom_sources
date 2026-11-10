@@ -2,7 +2,7 @@ app.defineApplication({
   key: "runkeeper",
   name: "Runkeeper",
   description: "Imports Runkeeper activities, kilometer splits and heart rate zones from a Runkeeper data export",
-  version: "1.0.1",
+  version: "1.0.2",
   author: "eazyBI",
   license: "MIT",
 

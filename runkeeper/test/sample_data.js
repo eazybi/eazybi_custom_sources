@@ -91,6 +91,22 @@ function dateOf(ms) {
   return new Date(ms).toISOString().substring(0, 10);
 }
 
+// The month of the last ski trip, as "2026-01".
+var lastSkiMonth = null;
+
+// A Sunday in the winter: the runner skis at least once in every winter month, also when the random picks
+// of the earlier Sundays of the month had no ski trip. The history ends yesterday, so these picks change from
+// day to day, and the Last 12 months of the sample reports would otherwise miss skiing on some days.
+function winterSunday(date) {
+  var month = date.substring(0, 7);
+  var lastSunday = new Date(`${date}T00:00:00Z`).getUTCMonth() !== new Date(Date.parse(`${date}T00:00:00Z`) +
+    7 * DAY_MS).getUTCMonth();
+  var workout = lastSunday && lastSkiMonth !== month ? "ski" :
+    sample.pickWeighted([["ski", 30], ["walk", 25], [null, 45]]);
+  if (workout === "ski") lastSkiMonth = month;
+  return workout;
+}
+
 // The workout of the day, or null on a rest day: more runs in the summer, and more of them as the runner
 // gets fitter.
 function plannedWorkout(date, progress) {
@@ -111,7 +127,7 @@ function plannedWorkout(date, progress) {
     case 6: return run(0.7, "long");
     default:
       if (summer) return sample.pickWeighted([["ride", 30], ["hike", 15], [null, 55]]);
-      if (winter) return sample.pickWeighted([["ski", 30], ["walk", 25], [null, 45]]);
+      if (winter) return winterSunday(date);
       return sample.pickWeighted([["walk", 30], ["ride", 10], [null, 60]]);
   }
 }
