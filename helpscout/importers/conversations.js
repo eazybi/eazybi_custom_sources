@@ -24,14 +24,17 @@ app.importers.conversations = {
 
   // The inbox being imported and the conversations imported so far. The count is the running total
   // of the whole import, not of this inbox alone, so it never goes backwards when the next inbox
-  // starts.
+  // starts. The inbox name comes last: eazyBI cuts a status message longer than 100 characters at
+  // its end, so a long inbox name is what gets cut, not the count.
   showProgress(mailbox, progress) {
     if (!progress) return;
-    var message = `Importing conversations of ${mailbox.name}`;
+    var message = "Importing conversations";
     if (progress.imported > 0) {
       message += `, ${progress.imported} imported`;
       if (progress.total) message += ` of ${progress.total}`;
+      message += ",";
     }
+    message += ` from ${mailbox.name}`;
     source.setStatusMessage(message, {percentage: this.percentageOf(progress)});
   },
 

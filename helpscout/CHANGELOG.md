@@ -4,6 +4,13 @@ All notable changes of the Help Scout source application type are documented in 
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and by
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.3] - 2026-11-16
+
+### Fixed
+
+- The conversations import status names the inbox after the count of imported conversations, so that
+  a long inbox name is cut from the 100-character status message instead of the count.
+
 ## [1.6.2] - 2026-11-02
 
 ### Fixed

@@ -251,9 +251,9 @@ describe("app.importer.importAll", () => {
       // inbox instead of standing still until the inbox is done.
       expect(importRun.statusMessages()).toContain("Importing customers (0%)");
       expect(importRun.statusMessages()).toContain("Importing customers, 2 imported of 2 (100%)");
-      expect(importRun.statusMessages()).toContain("Importing conversations of Support (0%)");
+      expect(importRun.statusMessages()).toContain("Importing conversations from Support (0%)");
       expect(importRun.statusMessages()).
-        toContain("Importing conversations of Support, 2 imported of 2 (100%)");
+        toContain("Importing conversations, 2 imported of 2, from Support (100%)");
     });
   });
 

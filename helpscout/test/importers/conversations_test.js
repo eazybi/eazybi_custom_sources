@@ -310,4 +310,24 @@ describe("app.importers.conversations", () => {
       expect(dwh.measures.conversations.rows()).toEqual([]);
     });
   });
+
+  describe("showProgress", () => {
+    beforeEach(() => importRun.prepare());
+
+    // eazyBI cuts a status message longer than 100 characters at its end, and an & of the inbox name
+    // takes 5 of them once escaped. The inbox name comes after the count, so a long name is cut and
+    // the count and the percentage are kept.
+    test("keeps the count and the percentage of an inbox with a long name", () => {
+      var mailbox = {key: "13", name: "Customer Success & Support - Enterprise Accounts EMEA"};
+
+      app.importers.conversations.showProgress(mailbox,
+        {imported: 11250, total: 45000, mailboxIndex: 0, mailboxCount: 1});
+
+      var message = _.last(importRun.statusMessages());
+      expect(message.length).toBeLessThanOrEqual(100);
+      expect(message.indexOf("Importing conversations, 11250 imported of 45000, from Customer")).
+        toBe(0);
+      expect(message.slice(-9)).toBe("... (25%)");
+    });
+  });
 });

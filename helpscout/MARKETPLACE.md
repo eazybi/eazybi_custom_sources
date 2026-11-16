@@ -10,7 +10,8 @@ Analyze the conversations of your Help Scout inboxes in eazyBI and see how your 
 
 The eazyBI support team built this app to analyze its own Help Scout data. Read
 [How We Measure Our Support, and How You Can Too](https://eazybi.com/blog/how-we-measure-our-support-and-how-you-can-too)
-to see the reports it uses.
+to see the reports it uses. You can also watch [the setup video](https://www.youtube.com/watch?v=zoeKpi8BrD0) to learn
+how to install the app and import your Help Scout data into eazyBI.
 
 ## Sample reports
 
