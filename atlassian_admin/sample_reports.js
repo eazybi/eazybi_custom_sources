@@ -60,10 +60,10 @@ app.defineSampleReports((samples) => {
       rows: {dimensions: [{name: "Admin Role", selected_set: adminRoles}]},
       pages: {dimensions: [ALL_GROUPS_PAGE, ALL_STATUSES_PAGE]},
       options: {nonempty: true},
-      view: {current: "bar_chart", bar_chart: {vertical: true, series_options: {
-        "Users": {color: samples.color("$blue-6")},
-        "Active users": {color: samples.color("$green-6")},
-        "Inactive users": {color: samples.color("$neutral-3")}
+      view: {current: "bar_chart", bar_chart: {vertical: true, data_labels: true, series_options: {
+        "Users": {color: samples.color("$blue-6"), dataLabelType: "top horizontal"},
+        "Active users": {color: samples.color("$green-6"), dataLabelType: "top horizontal"},
+        "Inactive users": {color: samples.color("$neutral-3"), dataLabelType: "top horizontal"}
       }}}
     }
   });
@@ -108,11 +108,14 @@ app.defineSampleReports((samples) => {
       },
       pages: {dimensions: [{name: "Product", selected_set: ["[Product].DefaultMember"]}, ALL_PLANS_PAGE]},
       options: {nonempty: true},
-      view: {current: "bar_chart", bar_chart: {vertical: true, series_options: {
-        "Product users": {color: samples.color("$blue-6")},
-        "Licensed users": {color: samples.color("$green-6")},
-        "Unused licenses": {color: samples.color("$neutral-3")}
-      }}}
+      // The labels show the product users of the small sites and sandboxes, whose bars are too short to
+      // see next to the main site, and the long site addresses wrap instead of being cut off.
+      view: {current: "bar_chart", bar_chart: {vertical: true, data_labels: true, show_full_caption: ["Site"],
+        series_options: {
+          "Product users": {color: samples.color("$blue-6"), dataLabelType: "top horizontal"},
+          "Licensed users": {color: samples.color("$green-6"), dataLabelType: "top horizontal"},
+          "Unused licenses": {color: samples.color("$neutral-3"), dataLabelType: "top horizontal"}
+        }}}
     }
   });
 

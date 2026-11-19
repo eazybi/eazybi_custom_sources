@@ -266,7 +266,9 @@ describe("app.importer.importAll", () => {
     });
 
     test("reports the import progress", () => {
-      expect(importRun.statusMessages()).toContain("Importing users (4 imported)");
+      // The directory answers three of the four organization users, and the v1 list the fourth one.
+      expect(importRun.statusMessages()).toContain("Importing users, 3 imported (75%)");
+      expect(importRun.statusMessages()).toContain("Importing users, 4 imported (100%)");
       expect(importRun.objectFailures()).toEqual([]);
     });
   });
@@ -541,6 +543,21 @@ describe("app.importer.importAll", () => {
         toEqual(["acc-alice", "acc-alice", "acc-alice", "acc-alice", "acc-bob", "acc-bob"]);
       expect(importRun.warnings()).toEqual([]);
     });
+
+    test("counts the progress of the users found in the selected products", () => {
+      var counts = [];
+      var showProgress = app.importers.users.showProgress;
+      mock.spyOn(app.importers.users, "showProgress").mockImplementation(function(progress) {
+        counts.push(`${progress.knownImported} of ${progress.total}`);
+        return showProgress.apply(this, arguments);
+      });
+
+      importRun.run();
+
+      // Carol has access to no selected product.
+      expect(counts).toEqual(["2 of 2"]);
+      expect(importRun.statusMessages()).toContain("Importing users, 3 imported (100%)");
+    });
   });
 
   // Without the product roles, the licensed users come from one search of the user and the admin roles.
@@ -657,6 +674,45 @@ describe("app.importer.importAll", () => {
       expect(productLastActive("acc-alice", "Studio")).toBe(Date.parse("2026-09-20T10:00:00Z") / 1000);
       expect(productLastActive("acc-alice", "Jira")).toBe(Date.parse("2026-09-10T12:00:00Z") / 1000);
       expect(importRun.objectFailures()).toEqual([]);
+    });
+
+    // Dave is a managed account that no directory search answers, only the v1 users.
+    test("reads the last active dates of a Studio user that only the v1 users answer", () => {
+      mock.post(SEARCH_PATH, {json: {data: [{accountId: "acc-alice", accountStatus: "active"},
+        {accountId: "acc-dave", accountStatus: "active"}], links: {}}, requestBody: productUsersSearchBody(STUDIO_ARIS)});
+      mock.get("/admin/v1/orgs/org-1/directory/users/acc-dave/last-active-dates", {json: {data: {product_access: [
+        {id: STUDIO_ARIS[0], key: "studio", last_active: "2026-09-25", last_active_timestamp: "2026-09-25T10:00:00Z"}
+      ]}, links: {next: null}}});
+
+      importRun.run();
+
+      expect(productLastActive("acc-dave", "Studio")).toBe(Date.parse("2026-09-25T10:00:00Z") / 1000);
+      expect(importRun.objectFailures()).toEqual([]);
+    });
+
+    // The import log counts the time of these requests in the users importer.
+    test("reads the last active dates within the users importer", () => {
+      var calls = [];
+      var startImport = logger.startImport;
+      var finishImport = logger.finishImport;
+      var getUsersLastActiveDates = app.api.getUsersLastActiveDates;
+      mock.spyOn(logger, "startImport").mockImplementation(function(name) {
+        calls.push(`start ${name}`);
+        return startImport.apply(this, arguments);
+      });
+      mock.spyOn(logger, "finishImport").mockImplementation(function(name) {
+        calls.push(`finish ${name}`);
+        return finishImport.apply(this, arguments);
+      });
+      mock.spyOn(app.api, "getUsersLastActiveDates").mockImplementation(function() {
+        calls.push("last active dates");
+        return getUsersLastActiveDates.apply(this, arguments);
+      });
+
+      importRun.run();
+
+      var request = calls.indexOf("last active dates");
+      expect(calls.lastIndexOf("start users", request)).toBeGreaterThan(calls.lastIndexOf("finish users", request));
     });
 
     test("keeps the stored rows of a user whose last active dates cannot be read", () => {

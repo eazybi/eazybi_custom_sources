@@ -3,7 +3,7 @@ app.defineApplication({
   name: "Atlassian Admin",
   description: "Imports the users of an Atlassian organization with their admin roles, groups, product" +
     " access and the license plans and seats of the selected Atlassian products.",
-  version: "1.0.0",
+  version: "1.1.0",
   author: "eazyBI",
   license: "MIT",
   defaultCubeName: "Atlassian Admin",
@@ -22,8 +22,8 @@ app.defineApplication({
       label: "Organization API key",
       required: true,
       hint: "An API key created by an organization admin at admin.atlassian.com > Settings > API keys." +
-        " A key created without scopes has full access; a scoped key needs the read scopes of accounts," +
-        " directories, groups, roles and workspaces."
+        " Create the key without scopes: Atlassian offers no scope for the user search and the last active" +
+        " dates that the import reads."
     }
   ],
   auth: {type: "header", headerName: "Authorization", headerValue: "Bearer {{params.api_key}}"},

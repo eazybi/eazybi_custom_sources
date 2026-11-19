@@ -24,11 +24,11 @@ var PRODUCT_ADMIN_ROLE_ID = "atlassian/admin";
 // basic, stakeholder, customer and guest roles are not billed and the user access admin has no access.
 var LICENSED_ROLE_IDS = ["atlassian/user", "atlassian/admin"];
 // The products whose roles take no license of their own: Assets comes with Jira Service Management, Guard
-// Detect ("beacon") is billed for the whole organization, and Atlas, Goals, Projects, Studio and Rovo are
-// included in the other products. Atlassian answers them on a free plan or without one, and reports no
-// activity for most of them. One of them on a paid plan is licensed after all, so that a product Atlassian
-// starts to bill on its own is not left out.
-var UNLICENSED_PRODUCT_KEYS = ["assets", "beacon", "goal", "project", "rovo", "studio", "townsquare"];
+// Detect ("beacon") is billed for the whole organization, and Atlas, Goals, Projects, Studio, Rovo and
+// Atlassian Analytics ("avp") are included in the other products. Atlassian answers them on a free plan or
+// without one, and reports no activity for most of them. One of them on a paid plan is licensed after all, so
+// that a product Atlassian starts to bill on its own is not left out.
+var UNLICENSED_PRODUCT_KEYS = ["assets", "avp", "beacon", "goal", "project", "rovo", "studio", "townsquare"];
 var FREE_PLAN_KEY = "free";
 // The products served for a site from a host that is not the site's own, such as the detect.atlassian.com of
 // Guard Detect.
@@ -62,11 +62,14 @@ var PRODUCT_NAMES = {
   townsquare: "Atlas",
   rovo: "Rovo",
   beacon: "Guard Detect",
+  avp: "Atlassian Analytics",
   studio: "Studio"
 };
 // The source selection key of a whole site; a workspace key is its ARI without the "ari:cloud:" prefix
 // ("confluence/site/<cloud id>"), so the two never collide.
 var SITE_KEY_PREFIX = "site/";
+// The characters of a workspace id that tell apart the products without a site of the same name.
+var SHORT_WORKSPACE_ID_LENGTH = 8;
 
 // The selectable user profile and security attributes. Their values arrive with the directory user
 // search the import performs anyway, so offering a field costs no extra requests; the catalog is fixed
@@ -119,7 +122,7 @@ app.api = {
       site.workspaces.forEach((workspace) => {
         options.push({
           key: workspace.key,
-          name: workspace.productName === site.name ? site.name : `${workspace.productName} — ${site.name}`
+          name: workspace.productName === site.plainName ? site.name : `${workspace.productName} — ${site.name}`
         });
       });
     });
@@ -201,11 +204,47 @@ app.api = {
       }
       catalog.sites.push(site);
     });
+    this.nameSameNamedSites(catalog.sites);
     // The sites first, then the products without a site, each by name.
     catalog.sites = _.sortBy(_.sortBy(catalog.sites, (site) => site.name.toLowerCase()),
       (site) => site.cloudId ? 0 : 1);
 
     return catalog;
+  },
+
+  // Products without a site that have the same name, such as two Studio workspaces, which Atlassian answers
+  // without an address and with the product name as their name, get the start of their workspace id added to
+  // the name — longer when the ids start alike, as Trello ids start with their creation time. The products that
+  // share an id keep the name, for the Site dimension to tell apart by the site key. The plainName is the name
+  // without the id.
+  nameSameNamedSites(sites) {
+    sites.forEach((site) => { site.plainName = site.name; });
+
+    var sameNamed = _.groupBy(sites.filter((site) => !site.cloudId), "name");
+    Object.keys(sameNamed).forEach((name) => {
+      var group = sameNamed[name];
+      if (group.length < 2) return;
+
+      var workspaceId = (site) => site.entries[0].ari.replace(/^.*\//, "");
+      var idCounts = _.countBy(group, workspaceId);
+      var named = group.filter((site) => idCounts[workspaceId(site)] === 1);
+      var length = this.distinctPrefixLength(named.map(workspaceId), SHORT_WORKSPACE_ID_LENGTH);
+      named.forEach((site) => { site.name = `${name} (${this.idStart(workspaceId(site), length)})`; });
+    });
+  },
+
+  // The start of an id, with the character after a separator it would end with ("ws-trello-2", not
+  // "ws-trello-"). Leaving the separator out would make it the start of another id ("ws-trello").
+  idStart(id, length) {
+    var start = id.slice(0, length);
+    return /[^A-Za-z0-9]$/.test(start) && id.length > length ? id.slice(0, length + 1) : start;
+  },
+
+  // The shortest length, at least minLength, at which the starts of the distinct ids differ.
+  distinctPrefixLength(ids, minLength) {
+    var length = minLength;
+    while (_.uniq(ids.map((id) => id.slice(0, length))).length < ids.length) length++;
+    return length;
   },
 
   // The site of every workspace URL, which a v1 product access names: also the URL of a product served for a
@@ -378,20 +417,64 @@ app.api = {
   },
 
   // The last activity of one user in every product, with one request per user (and page): the activity of
-  // the products the directory user search does not answer, keyed by the ARI of the workspace.
-  getUserLastActiveDates(accountId) {
+  // the products the directory user search does not answer, keyed by the ARI of the workspace. With a
+  // cursor, the pages from that cursor on.
+  getUserLastActiveDates(accountId, cursor) {
     var accesses = [];
-    var params = {};
+    var params = cursor ? {cursor: cursor} : {};
 
     for (;;) {
       let page = source.getDocument(
         this.v1Path(`/directory/users/${encodeURIComponent(accountId)}/last-active-dates`), params);
-      ((page && page.data && page.data.product_access) || []).forEach((access) => accesses.push(access));
-      let cursor = this.nextCursor(page);
-      if (!cursor) return accesses;
+      this.lastActiveAccesses(page).forEach((access) => accesses.push(access));
+      let nextCursor = this.nextCursor(page);
+      if (!nextCursor) return accesses;
 
-      params = {cursor: cursor};
+      params = {cursor: nextCursor};
     }
+  },
+
+  // The last activity of many users, with their first pages requested in parallel: the accesses keyed by
+  // account id, and the error of every user whose activity could not be read. One failed first page ends the
+  // parallel requests, so the users they did not answer are read one by one, and only the failing users
+  // have an error. A failed next page is the error of its user alone.
+  getUsersLastActiveDates(accountIds) {
+    var result = {byAccountId: {}, errors: {}};
+    if (accountIds.length === 0) return result;
+
+    var readUser = (accountId, read) => {
+      try {
+        result.byAccountId[accountId] = read();
+      } catch (error) {
+        source.checkCanceling();
+        result.errors[accountId] = error;
+      }
+    };
+
+    // The object ids of getAllDocuments are not URL escaped, and an account id can contain a colon.
+    try {
+      source.getAllDocuments(accountIds.map(encodeURIComponent),
+        this.v1Path("/directory/users/{{id}}/last-active-dates"), {}, (objectId, page) => {
+          var accountId = decodeURIComponent(objectId);
+          var cursor = this.nextCursor(page);
+          readUser(accountId, () => this.lastActiveAccesses(page).
+            concat(cursor ? this.getUserLastActiveDates(accountId, cursor) : []));
+        });
+    } catch (error) {
+      source.checkCanceling();
+      logger.warn(`The last activity of the users is read one by one, as a parallel request failed: ${error.message}`);
+    }
+
+    accountIds.forEach((accountId) => {
+      if (result.byAccountId[accountId] || result.errors[accountId]) return;
+
+      readUser(accountId, () => this.getUserLastActiveDates(accountId));
+    });
+    return result;
+  },
+
+  lastActiveAccesses(page) {
+    return (page && page.data && page.data.product_access) || [];
   },
 
   // One page of managed accounts per callback: the v1 endpoint answers the per product last active dates of

@@ -22,6 +22,9 @@ var V1_STATUS_NAMES = {active: "Active", inactive: "Deactivated", closed: "Close
 var STATUS_ORDINALS = {
   Active: 1, Suspended: 2, "Not invited": 3, Deactivated: 4, "For deletion": 5, Closed: 6
 };
+// The statuses of the users Atlassian does not bill. Such a user keeps the roles on the products, also the
+// licensed ones, through the groups an identity provider still syncs. A not invited user is billed.
+var UNBILLED_STATUSES = ["Suspended", "Deactivated", "For deletion", "Closed"];
 // The products whose activity on their own workspace the directory user search does not answer — of Studio
 // it answers only the activity recorded under the site — so it is read from the last active dates of every
 // user with access to them, with one request per user.
@@ -49,7 +52,14 @@ app.importers.users = {
       tracking: {groups: {}, activeGroups: {}}
     };
     var v1Users = this.collectOrgUsers();
-    var progress = {imported: 0};
+    var productUsers = workspaces.productUsers || {};
+    var progress = {
+      imported: 0,
+      knownImported: 0,
+      isKnown: (accountId) => Boolean(v1Users.byAccountId[accountId] || productUsers[accountId]),
+      total: Object.keys(v1Users.byAccountId).length +
+        Object.keys(productUsers).filter((accountId) => !v1Users.byAccountId[accountId]).length
+    };
     var seen = {};
 
     directories.forEach((directory) =>
@@ -57,9 +67,12 @@ app.importers.users = {
 
     var leftoverIds = Object.keys(v1Users.byAccountId).filter((accountId) => seen[accountId] !== true);
     for (let start = 0; start < leftoverIds.length; start += LEFTOVER_BATCH_SIZE) {
-      let batch = leftoverIds.slice(start, start + LEFTOVER_BATCH_SIZE).
-        map((accountId) => this.fromOrgUser(v1Users.byAccountId[accountId], workspaces));
-      this.importBatch(batch, shared, progress);
+      let accountIds = leftoverIds.slice(start, start + LEFTOVER_BATCH_SIZE);
+      this.importBatch(() => {
+        var lastActiveDates = this.workspaceLastActiveDates(accountIds, workspaces);
+        return accountIds.map((accountId) =>
+          this.fromOrgUser(v1Users.byAccountId[accountId], workspaces, lastActiveDates));
+      }, shared, progress);
     }
 
     this.markUntrackedGroups(shared.tracking);
@@ -134,26 +147,52 @@ app.importers.users = {
   },
 
   importPage(users, workspaces, shared, v1Users, seen, progress) {
-    var batch = [];
-    users.forEach((user) => {
-      if (!user || !user.accountId || seen[user.accountId] === true) return;
+    var newUsers = users.filter((user) => {
+      if (!user || !user.accountId || seen[user.accountId] === true) return false;
       seen[user.accountId] = true;
-      batch.push(this.fromDirectoryUser(user, v1Users.byAccountId[user.accountId], workspaces));
+      return true;
     });
-    this.importBatch(batch, shared, progress);
+    if (newUsers.length === 0) return;
+
+    this.importBatch(() => {
+      var lastActiveDates = this.workspaceLastActiveDates(newUsers.map((user) => user.accountId), workspaces);
+      return newUsers.map((user) =>
+        this.fromDirectoryUser(user, v1Users.byAccountId[user.accountId], workspaces, lastActiveDates));
+    }, shared, progress);
   },
 
-  importBatch(batch, shared, progress) {
-    if (batch.length === 0) return;
+  // The last active dates of the users of a batch, read only of the users of hasWorkspaceActivityAccess (see
+  // app.api.getUsersLastActiveDates).
+  workspaceLastActiveDates(accountIds, workspaces) {
+    return app.api.getUsersLastActiveDates(accountIds.
+      filter((accountId) => this.hasWorkspaceActivityAccess(accountId, workspaces)));
+  },
 
+  // The users of a batch are built within its importer, as building them reads the Studio activity of the
+  // Studio users, and the import log tells the time of the batch with these requests.
+  importBatch(buildBatch, shared, progress) {
     logger.startImport("users");
+    var batch = buildBatch();
     var rowsOfUsers = batch.map((user) => this.importOne(user, shared)).filter(Boolean);
     dwh.measures.users.importRows(rowsOfUsers.map((rows) => rows.user));
     this.importProductAccessRows(rowsOfUsers.map((rows) => rows.productAccess));
     logger.finishImport("users", batch.length);
 
     progress.imported += batch.length;
-    source.setStatusMessage(`Importing users (${progress.imported} imported)`);
+    progress.knownImported += batch.filter((user) => progress.isKnown(user.accountId)).length;
+    this.showProgress(progress);
+  },
+
+  // The percent is of the users known before the first user is imported: the v1 organization users, which are
+  // only the managed accounts, and the users the access searches found in the selected products. A directory
+  // also answers the other users, without access to a selected product, whose count is not known ahead.
+  showProgress(progress) {
+    var message = `Importing users, ${progress.imported} imported`;
+    if (progress.total > 0) {
+      source.setStatusMessage(message, {percentage: progress.knownImported * 100 / progress.total});
+    } else {
+      source.setStatusMessage(message);
+    }
   },
 
   // The product access rows of many users per call, within the row limit of a call. The rows of one user
@@ -172,8 +211,9 @@ app.importers.users = {
 
   // The unified user of a v2 directory search answer, enriched from the v1 answer of the same account.
   // The v2 product accesses win when they are answered — they carry the site id and a precise timestamp —
-  // and the v1 accesses of the enrichment stand in when they are not.
-  fromDirectoryUser(user, v1User, workspaces) {
+  // and the v1 accesses of the enrichment stand in when they are not. lastActiveDates are the last active
+  // dates of the batch (see workspaceLastActiveDates).
+  fromDirectoryUser(user, v1User, workspaces, lastActiveDates) {
     var groups = [];
     (user.groups || []).forEach((group) => {
       if (!group || !group.name) return;
@@ -185,7 +225,7 @@ app.importers.users = {
     var activeAccesses = (user.productAccess || []).length > 0
       ? this.resolveV2Accesses(user.productAccess, workspaces)
       : this.resolveV1Accesses((v1User && v1User.product_access) || [], workspaces);
-    var workspaceActivity = this.workspaceActivity(user.accountId, workspaces);
+    var workspaceActivity = this.workspaceActivity(user.accountId, workspaces, lastActiveDates);
     var activity = activeAccesses.concat(workspaceActivity.accesses);
     var accesses = this.withProductUsers(user.accountId,
       this.withoutRevokedAccesses(user.accountId, activity, workspaces), workspaces);
@@ -205,24 +245,23 @@ app.importers.users = {
     };
   },
 
-  // The accesses of the WORKSPACE_ACTIVITY_PRODUCT_KEYS products the user was active in, read only for a user
-  // the access search of such a selected workspace found. A request that fails is the error of the user.
-  workspaceActivity(accountId, workspaces) {
+  // The last active dates are read only of a user the access search of a selected
+  // WORKSPACE_ACTIVITY_PRODUCT_KEYS workspace found.
+  hasWorkspaceActivityAccess(accountId, workspaces) {
     var found = (workspaces.productUsers || {})[accountId] || {};
-    var hasAccess = Object.keys(found).some((workspaceKey) =>
+    return Object.keys(found).some((workspaceKey) =>
       WORKSPACE_ACTIVITY_PRODUCT_KEYS.indexOf(found[workspaceKey].productKey) >= 0);
-    if (!hasAccess) return {accesses: [], error: null};
+  },
 
-    var lastActiveDates;
-    try {
-      lastActiveDates = app.api.getUserLastActiveDates(accountId);
-    } catch (error) {
-      source.checkCanceling();
-      return {accesses: [], error: new Error(`The last activity could not be read: ${error.message}`)};
-    }
+  // The accesses of the WORKSPACE_ACTIVITY_PRODUCT_KEYS products the user was active in, from the last active
+  // dates read for the batch, which hold only the users of hasWorkspaceActivityAccess. A request that failed is
+  // the error of the user.
+  workspaceActivity(accountId, workspaces, lastActiveDates) {
+    var error = lastActiveDates.errors[accountId];
+    if (error) return {accesses: [], error: new Error(`The last activity could not be read: ${error.message}`)};
 
     // The activity recorded under the site comes with the directory user search.
-    var productAccess = lastActiveDates.
+    var productAccess = (lastActiveDates.byAccountId[accountId] || []).
       filter((access) => WORKSPACE_ACTIVITY_PRODUCT_KEYS.indexOf(app.api.productKey(access.key)) >= 0 &&
         workspaces.catalog.byAri[access.id]).
       map((access) => ({key: access.key, id: access.id,
@@ -262,9 +301,12 @@ app.importers.users = {
     return text.charAt(0).toUpperCase() + text.slice(1);
   },
 
-  // The unified user of a v1 answer alone — an account no directory search returned.
-  fromOrgUser(v1User, workspaces) {
-    var activity = this.resolveV1Accesses(v1User.product_access || [], workspaces);
+  // The unified user of a v1 answer alone — an account no directory search returned. lastActiveDates are the
+  // last active dates of the batch (see workspaceLastActiveDates).
+  fromOrgUser(v1User, workspaces, lastActiveDates) {
+    var workspaceActivity = this.workspaceActivity(v1User.account_id, workspaces, lastActiveDates);
+    var activity = this.resolveV1Accesses(v1User.product_access || [], workspaces).
+      concat(workspaceActivity.accesses);
     var accesses = this.withProductUsers(v1User.account_id,
       this.withoutRevokedAccesses(v1User.account_id, activity, workspaces), workspaces);
 
@@ -278,7 +320,8 @@ app.importers.users = {
       groups: [],
       lastActive: this.lastActive(activity),
       accesses: accesses,
-      profile: {}
+      profile: {},
+      error: workspaceActivity.error
     };
   },
 
@@ -345,10 +388,13 @@ app.importers.users = {
       generation: generation
     }, customFieldValues.foreignKeys);
 
+    // The tracking group stays by the licensed role, as an unbilled user is still a user of that kind.
+    var billed = UNBILLED_STATUSES.indexOf(user.status) < 0;
     var productAccessRows = [];
     user.accesses.forEach((access) => {
       if (access.skipped) return;
 
+      var licensed = access.licensed && billed;
       var accessRoles = rolesOf[access.workspaceKey];
       var lastActiveTs = this.lastActiveTimestamp(access.lastActive);
       var trackingGroup = this.trackingGroup(access);
@@ -371,10 +417,10 @@ app.importers.users = {
         plan_id: access.planId,
         time_id: this.lastActiveTimeId(access.lastActive, "product last active"),
         product_users: 1,
-        licensed_users: access.licensed ? 1 : null,
+        licensed_users: licensed ? 1 : null,
         product_role_bt_id: shared.importProductRoles ? this.productRoleBtId(accessRoles) : null,
         product_admins: this.holdsRole(accessRoles, app.api.PRODUCT_ADMIN_ROLE_ID) ? 1 : null,
-        unused_licenses: access.licensed && !access.lastActive ? 1 : null,
+        unused_licenses: licensed && !access.lastActive ? 1 : null,
         product_last_active_ts: lastActiveTs,
         generation: generation
       }, customFieldValues.foreignKeys));

@@ -9,9 +9,9 @@ seats of the selected Atlassian products.
 1. Find the **organization ID** in the Atlassian Administration URL:
    `https://admin.atlassian.com/o/<organization ID>`.
 2. Create an **organization API key** as an organization admin at
-   [admin.atlassian.com](https://admin.atlassian.com) > Settings > API keys. A key created without
-   scopes has full access; a scoped key needs the read scopes of accounts, directories, groups, roles
-   and workspaces.
+   [admin.atlassian.com](https://admin.atlassian.com) > Settings > API keys. Create the key without
+   scopes: Atlassian offers no scope for the user search and the last active dates that the import
+   reads, so a scoped key cannot import the users.
 3. Enter both on the connection page and select the products to import.
 
 An organization API key expires on the date chosen when it was created, at most a year later. The imports
@@ -70,11 +70,11 @@ organization the data is imported from.
   Service Management portal customer) and Guest. A user can hold several roles on a product. Roles other
   than these, such as the ones of Compass, are not imported.
 - **Site** — the Atlassian Cloud sites of the selected products, named by their address, and the
-  products without a site, named by their address (a Bitbucket workspace) or name — two of the same name are
-  told apart by their key added to the name. Atlassian keeps the
-  product access of the users to a site the organization no longer has, such as a deleted sandbox. With all
-  products selected, such a site is a member of its own marked **(removed)**, named by its cloud id, or by its
-  address when Atlassian answers no cloud id for the access.
+  products without a site, named by their address (a Bitbucket workspace) or name. Products of the same
+  name, such as two Studio workspaces, show the start of their workspace id after the name. Atlassian keeps
+  the product access of the users to a site the organization no longer has, such as a deleted sandbox. With
+  all products selected, such a site is a member of its own marked **(removed)**, named by its cloud id, or
+  by its address when Atlassian answers no cloud id for the access.
 - **Product** — Jira, Jira Service Management, Confluence, Assets, Bitbucket and the other products.
 - **Plan** — the license plan of the product workspace: Free, Standard, Premium or Enterprise.
 - **Inactivity interval** — the days since the last activity of a user in a product, counted at every
@@ -104,6 +104,8 @@ organization the data is imported from.
 - **Licensed users** — the product users who hold a license of the product: its User or Admin role,
   assigned directly or through a group. These are the users who take a seat of the product: the users
   Atlassian bills on a paid plan, and the users who count against the user limit of a Free plan.
+  Suspended, deactivated, closed and for deletion users are not billed, so they are not licensed users,
+  even when a synced group still gives them the role. They still count as product users.
 - **Unused licenses** — the licensed users who never used the product.
 - **Product admins** — with the Import product roles option, the product users who hold the Admin role of
   the product.
@@ -120,10 +122,10 @@ organization the data is imported from.
 The product users of Jira Service Management also count its portal customers, and the product users of a
 product include its guests and the admins without product access; the licensed users leave them out.
 Assets, which comes with Jira Service Management, Guard Detect, which is billed for the whole organization
-with Atlassian Guard, and Atlas, Goals, Projects, Studio and Rovo, which come with the other products, have
-product users but no licensed users unless Atlassian reports a paid plan for them. Sandboxes have no
-licensed users, and Atlassian answers none of a Bitbucket workspace: its product users are the users who
-were active in it.
+with Atlassian Guard, and Atlas, Goals, Projects, Studio, Rovo and Atlassian Analytics, which come with the
+other products, have product users but no licensed users unless Atlassian reports a paid plan for them.
+Sandboxes have no licensed users, and Atlassian answers none of a Bitbucket workspace: its product users are
+the users who were active in it.
 
 ## Sample reports
 
@@ -149,8 +151,12 @@ The **Atlassian Admin overview** dashboard combines them all but Licensed users 
 - Every import reads the whole organization; there is no incremental range. The Atlassian admin API
   rate limits apply, so very large organizations import more slowly. Every product that is not selected
   saves the requests of its users and roles — all but the request of its admins with the Import product
-  roles option — so select only the products to analyze in a large organization. Studio takes one more request for every user with access to it, as Atlassian answers the
-  last activity in Studio only per user.
+  roles option — so select only the products to analyze in a large organization. Studio takes one more
+  request for every user with access to it, as Atlassian answers the last activity in Studio only per user.
+  These requests run in parallel, as many at once as the `max_concurrent_requests` advanced setting allows
+  (3 by default, at most 10). In an organization where most users have access to Studio, they can still
+  take most of the import time: raise the setting while the Atlassian rate limits allow it, or deselect
+  Studio in the product selection of the connection page when its activity is not needed.
 - Atlassian takes a while to report a new activity: the last activity can lag behind the Last seen of
   Atlassian Administration for up to a day, until an import after Atlassian has reported it.
 - An import fails when Atlassian does not answer the users of the organization, or the users or the roles

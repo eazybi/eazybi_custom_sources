@@ -223,7 +223,7 @@ describe("app.importers.users", () => {
       var user = app.importers.users.fromOrgUser({account_id: "acc-dave", product_access: [
         {key: "jira-software", url: "https://acme.atlassian.net", last_active: "2026-09-01T08:00:00Z"},
         {key: "confluence", url: "https://acme.atlassian.net", last_active: "2025-03-01T08:00:00Z"}
-      ]}, context);
+      ]}, context, {byAccountId: {}, errors: {}});
 
       expect(user.accesses.map((access) => access.productKey)).toEqual(["jira-software"]);
     });
@@ -236,29 +236,30 @@ describe("app.importers.users", () => {
 
       var user = app.importers.users.fromOrgUser({account_id: "acc-dave", product_access: [
         {key: "confluence", url: "https://acme.atlassian.net", last_active: "2026-09-01T08:00:00Z"}
-      ]}, context);
+      ]}, context, {byAccountId: {}, errors: {}});
 
       expect(user.accesses).toEqual([]);
       expect(user.lastActive).toBe("2026-09-01T08:00:00Z");
 
       var directoryUser = app.importers.users.fromDirectoryUser({accountId: "acc-erin", productAccess: [
         {key: "confluence", id: "ari:cloud:confluence::site/site-acme", lastActiveTimestamp: "2026-09-02T08:00:00Z"}
-      ]}, null, context);
+      ]}, null, context, {byAccountId: {}, errors: {}});
 
       expect(directoryUser.accesses).toEqual([]);
       expect(directoryUser.lastActive).toBe("2026-09-02T08:00:00Z");
     });
   });
 
-  describe("workspaceActivity", () => {
-    test("reads the last active dates only of a user with access to a Studio workspace", () => {
-      var context = workspacesContext(["site/site-acme"]);
-      var jira = context.catalog.byAri["ari:cloud:jira-software::site/site-acme"];
-      context.productUsers = {"acc-bob": {[jira.key]: jira}};
-      var lastActiveDates = mock.spyOn(app.api, "getUserLastActiveDates").mockImplementation(() => []);
+  describe("hasWorkspaceActivityAccess", () => {
+    test("is true only for a user with access to a Studio workspace", () => {
+      var context = {productUsers: {
+        "acc-bob": {"jira-software/site/site-acme": {productKey: "jira-software"}},
+        "acc-carol": {"studio/workspace/ws-studio": {productKey: "studio"}}
+      }};
 
-      expect(app.importers.users.workspaceActivity("acc-bob", context)).toEqual({accesses: [], error: null});
-      expect(lastActiveDates).not.toHaveBeenCalled();
+      expect(app.importers.users.hasWorkspaceActivityAccess("acc-bob", context)).toBe(false);
+      expect(app.importers.users.hasWorkspaceActivityAccess("acc-carol", context)).toBe(true);
+      expect(app.importers.users.hasWorkspaceActivityAccess("acc-dave", context)).toBe(false);
     });
   });
 
@@ -354,6 +355,102 @@ describe("app.importers.users", () => {
 
       expect(shared.tracking.activeGroups).toEqual(
         {"site/site-acme|confluence|licensed": true, "studio/acme|studio|unlicensed": true});
+    });
+  });
+
+  describe("buildRows", () => {
+    function accessRows(status) {
+      importRun.prepare();
+      app.importers.sweep.begin();
+      var shared = {productRoles: {}, customFields: [], tracking: {groups: {}, activeGroups: {}}};
+      var rows = app.importers.users.buildRows({accountId: "acc-1", name: "User", status: status,
+        platformRoles: [], groups: [], profile: {}, lastActive: null,
+        accesses: [
+          {siteKey: "site/site-acme", productKey: "jira-software", workspaceKey: "jira-software/site/site-acme",
+            licensed: true, lastActive: null},
+          {siteKey: "site/site-acme", productKey: "confluence", workspaceKey: "confluence/site/site-acme",
+            licensed: true, lastActive: "2026-09-01T08:00:00Z"}
+        ]}, shared);
+      return {shared: shared, rows: rows.productAccess.map((row) =>
+        _.pick(row, "product_users", "licensed_users", "unused_licenses"))};
+    }
+
+    test("counts the licenses of an active user", () => {
+      expect(accessRows("Active").rows).toEqual([
+        {product_users: 1, licensed_users: 1, unused_licenses: 1},
+        {product_users: 1, licensed_users: 1, unused_licenses: null}
+      ]);
+    });
+
+    ["Suspended", "Deactivated", "For deletion", "Closed"].forEach((status) => {
+      test(`counts the product access but no license of a user of the ${status} status`, () => {
+        var result = accessRows(status);
+
+        expect(result.rows).toEqual([
+          {product_users: 1, licensed_users: null, unused_licenses: null},
+          {product_users: 1, licensed_users: null, unused_licenses: null}
+        ]);
+        expect(Object.keys(result.shared.tracking.groups)).toEqual(
+          ["site/site-acme|jira-software|licensed", "site/site-acme|confluence|licensed"]);
+      });
+    });
+  });
+
+  describe("importPage", () => {
+    test("imports a user once when a page answers it twice", () => {
+      importRun.prepare();
+      var batches = [];
+      mock.spyOn(app.importers.users, "importBatch").mockImplementation((buildBatch) => {
+        batches.push(buildBatch().map((user) => user.accountId));
+      });
+      mock.spyOn(app.importers.users, "fromDirectoryUser").mockImplementation((user) =>
+        ({accountId: user.accountId}));
+      var seen = {"acc-seen": true};
+
+      app.importers.users.importPage(
+        [{accountId: "acc-1"}, {accountId: "acc-seen"}, {accountId: "acc-1"}, null, {accountId: "acc-2"}],
+        {}, {}, {byAccountId: {}}, seen, {imported: 0, total: 0});
+
+      expect(batches).toEqual([["acc-1", "acc-2"]]);
+    });
+
+    test("reads the last active dates of the Studio users of the page in one call", () => {
+      importRun.prepare();
+      mock.spyOn(app.importers.users, "importBatch").mockImplementation((buildBatch) => buildBatch());
+      var lastActiveDates = {byAccountId: {}, errors: {}};
+      var getUsersLastActiveDates = mock.spyOn(app.api, "getUsersLastActiveDates").
+        mockImplementation(() => lastActiveDates);
+      var fromDirectoryUser = mock.spyOn(app.importers.users, "fromDirectoryUser").mockImplementation((user) =>
+        ({accountId: user.accountId}));
+      var workspaces = {productUsers: {
+        "acc-1": {"studio/workspace/ws-studio": {productKey: "studio"}},
+        "acc-2": {"jira-software/site/site-acme": {productKey: "jira-software"}},
+        "acc-3": {"studio/workspace/ws-studio": {productKey: "studio"}}
+      }};
+
+      app.importers.users.importPage([{accountId: "acc-1"}, {accountId: "acc-2"}, {accountId: "acc-3"}],
+        workspaces, {}, {byAccountId: {}}, {}, {imported: 0, total: 0});
+
+      expect(getUsersLastActiveDates.mock.calls).toEqual([[["acc-1", "acc-3"]]]);
+      expect(fromDirectoryUser.mock.calls.map((call) => call[3] === lastActiveDates)).toEqual([true, true, true]);
+    });
+  });
+
+  describe("showProgress", () => {
+    test("counts the imported users in percent of the known users", () => {
+      importRun.prepare();
+
+      app.importers.users.showProgress({imported: 1500, knownImported: 1200, total: 6147});
+
+      expect(importRun.statusMessages()).toEqual(["Importing users, 1500 imported (19%)"]);
+    });
+
+    test("shows no percent without known users", () => {
+      importRun.prepare();
+
+      app.importers.users.showProgress({imported: 5, knownImported: 0, total: 0});
+
+      expect(importRun.statusMessages()).toEqual(["Importing users, 5 imported"]);
     });
   });
 

@@ -46,16 +46,16 @@ describe("app.importers.workspaces", () => {
 
   test("keeps two workspaces of the same name apart", () => {
     var workspaces = mock.fixture("workspaces_page2");
-    workspaces.data.push({id: "ari:cloud:trello::workspace/ws-trello-2", type: "workspaces",
+    workspaces.data.push({id: "ari:cloud:trello::workspace/ws-other", type: "workspaces",
       attributes: {name: "Acme Trello", typeKey: "trello", type: "Trello", hostUrl: null}});
     mock.post("/admin/v2/orgs/org-1/workspaces", {json: workspaces, requestBody: '{"cursor":"WSCURSOR2"}'});
     importRun.prepare();
 
-    app.importers.workspaces.importAll(["trello/workspace/ws-trello", "trello/workspace/ws-trello-2"]);
+    app.importers.workspaces.importAll(["trello/workspace/ws-trello", "trello/workspace/ws-other"]);
 
     expect(_.sortBy(dwh.dimensions.sites.rows({columns: ["site_key", "name"]}), "site_key")).toEqual([
-      {site_key: "trello/workspace/ws-trello", name: "Acme Trello"},
-      {site_key: "trello/workspace/ws-trello-2", name: "Acme Trello"}
+      {site_key: "trello/workspace/ws-other", name: "Acme Trello (ws-other)"},
+      {site_key: "trello/workspace/ws-trello", name: "Acme Trello (ws-trell)"}
     ]);
   });
 });

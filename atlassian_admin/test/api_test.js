@@ -77,6 +77,59 @@ describe("app.api", () => {
       expect(catalog.sitesByHost["detect.atlassian.com"]).toBeNull();
     });
 
+    test("tells apart the products without a site of the same name by the start of their id", () => {
+      var studio = (id) => ({id: `ari:cloud:studio::workspace/${id}`, attributes: {name: "Studio", typeKey: "studio"}});
+      var catalog = app.api.workspaceCatalog([studio("1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d"),
+        studio("9f8e7d6c-5b4a-4392-8170-6f5e4d3c2b1a")]);
+
+      expect(catalog.sites.map((site) => site.name)).toEqual(["Studio (1a2b3c4d)", "Studio (9f8e7d6c)"]);
+      expect(app.api.workspaceCatalog([studio("1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d")]).sites[0].name).
+        toBe("Studio");
+    });
+
+    test("tells apart the products whose ids start alike by a longer start of their id", () => {
+      var trello = (id) => ({id: `ari:cloud:trello::workspace/${id}`, attributes: {name: "Acme", typeKey: "trello"}});
+      var catalog = app.api.workspaceCatalog([trello("5f1a2b3c4d"), trello("5f1a2b3c9e"), trello("5f1a2b3c")]);
+
+      expect(catalog.sites.map((site) => site.name).sort()).
+        toEqual(["Acme (5f1a2b3c)", "Acme (5f1a2b3c4)", "Acme (5f1a2b3c9)"]);
+    });
+
+    test("ends the id start of a product without a site after a separator", () => {
+      var trello = (id) => ({id: `ari:cloud:trello::workspace/${id}`, attributes: {name: "Acme", typeKey: "trello"}});
+      var catalog = app.api.workspaceCatalog([trello("ws-trello"), trello("ws-trello-2")]);
+
+      expect(catalog.sites.map((site) => site.name).sort()).toEqual(["Acme (ws-trello)", "Acme (ws-trello-2)"]);
+    });
+
+    test("leaves the names of the products without a site whose ids are the same", () => {
+      var workspace = (typeKey) => ({id: `ari:cloud:${typeKey}::workspace/ws-1`, attributes: {name: "Acme", typeKey: typeKey}});
+      var catalog = app.api.workspaceCatalog([workspace("trello"), workspace("compass")]);
+
+      expect(catalog.sites.map((site) => site.name)).toEqual(["Acme", "Acme"]);
+    });
+
+    test("tells apart the product whose id differs from the ones that share an id", () => {
+      var workspace = (typeKey, id) =>
+        ({id: `ari:cloud:${typeKey}::workspace/${id}`, attributes: {name: "Acme", typeKey: typeKey}});
+      var catalog = app.api.workspaceCatalog([workspace("goal", "ws-1"), workspace("project", "ws-1"),
+        workspace("trello", "5f1a2b3c4d")]);
+
+      expect(catalog.sites.map((site) => site.name).sort()).toEqual(["Acme", "Acme", "Acme (5f1a2b3c)"]);
+    });
+
+    test("offers a product without a site of the same name by its name alone", () => {
+      mock.post("/admin/v2/orgs/org-1/workspaces", {requestBody: '{"limit":250}', json: {data: [
+        {id: "ari:cloud:studio::workspace/1a2b3c4d-5e6f", attributes: {name: "Studio", typeKey: "studio"}},
+        {id: "ari:cloud:studio::workspace/9f8e7d6c-5b4a", attributes: {name: "Studio", typeKey: "studio"}}
+      ]}});
+
+      expect(app.api.getSourceSelections().options).toEqual([
+        {key: "studio/workspace/1a2b3c4d-5e6f", name: "Studio (1a2b3c4d)"},
+        {key: "studio/workspace/9f8e7d6c-5b4a", name: "Studio (9f8e7d6c)"}
+      ]);
+    });
+
     test("offers every site and every product workspace", () => {
       var selections = app.api.getSourceSelections();
 
@@ -187,6 +240,68 @@ describe("app.api", () => {
     });
   });
 
+  describe("getUsersLastActiveDates", () => {
+    var STUDIO_ARI = "ari:cloud:studio::workspace/ws-studio";
+    var JIRA_ARI = "ari:cloud:jira-software::site/site-acme";
+
+    function lastActiveDatesPath(encodedAccountId) {
+      return `/admin/v1/orgs/org-1/directory/users/${encodedAccountId}/last-active-dates`;
+    }
+
+    function lastActiveDates(ari, next) {
+      return {json: {data: {product_access: [{id: ari, key: "studio", last_active: "2026-09-20"}]},
+        links: {next: next || null}}};
+    }
+
+    test("reads the users by their escaped account ids and follows the next pages of a user", () => {
+      mock.get(lastActiveDatesPath("acc-1"), lastActiveDates(STUDIO_ARI, "C2"));
+      mock.get(lastActiveDatesPath("acc-1"), _.extend({params: {cursor: "C2"}}, lastActiveDates(JIRA_ARI)));
+      mock.get(lastActiveDatesPath("557058%3Aacc-2"), lastActiveDates(STUDIO_ARI));
+
+      var result = app.api.getUsersLastActiveDates(["acc-1", "557058:acc-2"]);
+
+      expect(_.mapObject(result.byAccountId, (accesses) => _.pluck(accesses, "id"))).toEqual({
+        "acc-1": [STUDIO_ARI, JIRA_ARI],
+        "557058:acc-2": [STUDIO_ARI]
+      });
+      expect(result.errors).toEqual({});
+    });
+
+    test("reads the users one by one after a failed request and reports only the failing user", () => {
+      mock.get(lastActiveDatesPath("acc-1"), lastActiveDates(STUDIO_ARI));
+      mock.get(lastActiveDatesPath("acc-2"), {status: 400, json: {message: "Bad request"}});
+      mock.get(lastActiveDatesPath("acc-3"), lastActiveDates(STUDIO_ARI));
+      var warn = mock.spyOn(logger, "warn");
+
+      var result = app.api.getUsersLastActiveDates(["acc-1", "acc-2", "acc-3"]);
+
+      expect(Object.keys(result.byAccountId).sort()).toEqual(["acc-1", "acc-3"]);
+      expect(Object.keys(result.errors)).toEqual(["acc-2"]);
+      expect(warn.mock.calls.length).toBe(1);
+      expect(warn.mock.calls[0][0]).toMatch(/^The last activity of the users is read one by one, as a parallel request failed: /);
+    });
+
+    test("reports a user whose next page fails without reading the other users again", () => {
+      mock.get(lastActiveDatesPath("acc-1"), lastActiveDates(STUDIO_ARI, "C2"));
+      mock.get(lastActiveDatesPath("acc-1"), {params: {cursor: "C2"}, status: 400, json: {message: "Bad request"}});
+      mock.get(lastActiveDatesPath("acc-2"), lastActiveDates(STUDIO_ARI));
+      var warn = mock.spyOn(logger, "warn");
+
+      var result = app.api.getUsersLastActiveDates(["acc-1", "acc-2"]);
+
+      expect(Object.keys(result.byAccountId)).toEqual(["acc-2"]);
+      expect(Object.keys(result.errors)).toEqual(["acc-1"]);
+      expect(mock.requests().filter((request) => request.url.indexOf("acc-1/last-active-dates") >= 0 &&
+        !(request.params && request.params.cursor)).length).toBe(1);
+      expect(warn.mock.calls).toEqual([]);
+    });
+
+    test("requests nothing without users", () => {
+      expect(app.api.getUsersLastActiveDates([])).toEqual({byAccountId: {}, errors: {}});
+      expect(mock.requests()).toEqual([]);
+    });
+  });
+
   describe("isLicensable", () => {
     var workspace = (typeKey, attributes, planKey) => app.api.workspaceEntry({
       id: `ari:cloud:${typeKey}::site/site-acme`,
@@ -198,7 +313,7 @@ describe("app.api", () => {
       expect(app.api.isLicensable(workspace("jira-software"))).toBe(true);
       expect(app.api.isLicensable(workspace("jira-software", {sandbox: {type: "NONE"}}))).toBe(true);
       expect(app.api.isLicensable(workspace("jira-software", {sandbox: {type: "CHILD"}}))).toBe(false);
-      ["cmdb", "beacon", "goal", "project", "rovo", "studio", "townsquare"].forEach((typeKey) => {
+      ["cmdb", "avp", "beacon", "goal", "project", "rovo", "studio", "townsquare"].forEach((typeKey) => {
         expect(app.api.isLicensable(workspace(typeKey))).toBe(false);
         expect(app.api.isLicensable(workspace(typeKey, {}, "FREE"))).toBe(false);
         expect(app.api.isLicensable(workspace(typeKey, {}, "none"))).toBe(false);
@@ -261,6 +376,7 @@ describe("app.api", () => {
       expect(app.api.productName("jira")).toBe("Jira");
       expect(app.api.productName("jira-service-desk")).toBe("Jira Service Management");
       expect(app.api.productName("townsquare")).toBe("Atlas");
+      expect(app.api.productName("avp")).toBe("Atlassian Analytics");
       expect(app.api.productName("some-new-product")).toBe("Some New Product");
     });
 
